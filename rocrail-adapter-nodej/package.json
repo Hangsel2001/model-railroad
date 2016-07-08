@@ -1,0 +1,10 @@
+{
+  "name": "rocrail-adapter-nodej",
+  "version": "0.0.0",
+  "description": "rocrail-adapter-nodej",
+  "main": "app.js",
+  "author": {
+    "name": "jag",
+    "email": ""
+  }
+}
