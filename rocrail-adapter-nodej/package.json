@@ -6,5 +6,8 @@
   "author": {
     "name": "jag",
     "email": ""
+  },
+  "dependencies": {
+    "mocha": "^2.5.3"
   }
 }
