@@ -8,6 +8,7 @@
     "email": ""
   },
   "dependencies": {
-    "mocha": "^2.5.3"
+    "mocha": "^2.5.3",
+    "serialport": "^4.0.1"
   }
 }

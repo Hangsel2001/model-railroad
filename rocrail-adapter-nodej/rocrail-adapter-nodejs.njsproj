@@ -32,7 +32,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.js" />
+    <Compile Include="block.js" />
     <Compile Include="commandFormatter.js" />
+    <Compile Include="loco.js" />
     <Compile Include="rocrailclient.js" />
     <Compile Include="tests.js">
       <SubType>Code</SubType>
