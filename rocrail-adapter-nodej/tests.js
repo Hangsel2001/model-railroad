@@ -25,3 +25,17 @@ describe('Header handling', function () {
         assert.equal(pack, '<?xml version="1.0" encoding="UTF-8"?><xmlh><xml size="27" name="fb"/></xmlh><fb state="true" addr="3"/>');
     })
 })
+
+describe('packge tests', function () {
+    it('creates sensor package', function () {
+        var pack = packager.Packager({ addrHigh: 0, addrLow: 3 });
+        var actual = pack.Package({
+            Group: packager.Groups.Sensor,
+            Code: packager.Codes.Sensor.Report,
+            Data: [0, 0, 1, 1]
+        });
+        assert.deepEqual(actual, [0, 0, 0, 0, 3, 8, 1, 4, 0, 0, 1, 1, 255]);
+    })
+
+ 
+})
