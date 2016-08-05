@@ -1,5 +1,6 @@
 ﻿var assert = require('assert');
 var formatter = require('./commandFormatter.js');
+var packager = require('./packager.js');
 
 describe('Header handling', function () {
     var command = '<lc dir="false" addr="3" V_raw="30"/>';
