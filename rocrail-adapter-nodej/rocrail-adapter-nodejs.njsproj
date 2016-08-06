@@ -43,6 +43,8 @@
       <TestFramework>Mocha</TestFramework>
     </Compile>
     <Compile Include="wire-master.js" />
+    <Content Include="config-example.json" />
+    <Content Include="config.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>

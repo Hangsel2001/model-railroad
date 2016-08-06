@@ -1,10 +1,12 @@
 ﻿var client = require('./RocrailClient.js');
 var rocnet = require('./rocnet.js');
-var wiremaster = require('./wire-master.js');
+
 var Serial = require('serialport');
-var port = new Serial('COM4', {
+var config = require('./config.json');
+var port = new Serial(config.COM, {
     parser: Serial.parsers.readline('\n')
 });
+var wiremaster = config.UseI2C ? require('./wire-master.js') : undefined;
 var dgram = require('dgram');
 var server = dgram.createSocket({ type: 'udp4', reuseAddr : true });
 
@@ -25,9 +27,11 @@ rocnet.on('connected', function () {
     console.log("Rocnet connected");   
 });
 
-wiremaster.on("data", function (data) { 
-    console.log(data);
-});
+if (wiremaster !== undefined) {
+    wiremaster.on("data", function (data) {
+        console.log(data);
+    });
+}
 
 
 client.on("connected", function () {

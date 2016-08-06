@@ -21,14 +21,16 @@ int dirBtn = 1;
 void setup() {
 
 	Wire.begin(0x08);                // join i2c bus with address #8
-	Wire.onReceive(receiveEvent);
 	Wire.onRequest(requestEvent);
  
   for (int i=0; i<SENSOR_COUNT; i++) {
     pinMode(sensors[i], INPUT_PULLUP);
   }
     for (int i=0; i<BTN_COUNT; i++) {
-    pinMode(btns[i], INPUT_PULLUP);
+		pinMode(btns[i], INPUT);
+		digitalWrite(btns[i], HIGH);
+		pinMode(btns[i], INPUT_PULLUP);
+	
   }
   pinMode(LIGHTS_PIN, INPUT_PULLUP);
   pinMode(DIR_PIN, INPUT_PULLUP);
@@ -102,27 +104,18 @@ int toggle(int val){
 }
 
 void requestEvent() {
-	Serial.print("Request: ");
-	if (whatToSend == 18) {
-
-		Serial.println("Sent data");
-		Wire.write(myPin);
+	uint8_t output[2] = { 0,0 };
+	uint8_t currentByte = 0;
+	for (int i = 0; i < SENSOR_COUNT; i++) {
+		if (i == 8) {
+			currentByte++;
+		}
+		output[currentByte] = output[currentByte] & prevs[i];
+		output[currentByte] = output[currentByte] << 1;
 	}
-	else
-	{
-		byte data[] = { 0,0 };
-		Wire.write(data, 2);
-		Serial.println("Sent empty");
-	}
-
+		Wire.write(output, 2);
+		Serial.print(output[0]);
+		Serial.print(" ");
+		Serial.println(output[1]);
 }
 
-void receiveEvent(int howMany) {
-	Serial.print("Receive: ");
-	Serial.println(howMany);
-	while (0 < Wire.available()) { // loop through all but the last
-		int c = Wire.read(); // receive byte as a character
-		Serial.println(c);         // print the character
-		whatToSend = (byte)c;
-	}
-}
