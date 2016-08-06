@@ -3,6 +3,9 @@
 #define VELOCITY_PIN A5
 #define DIR_PIN 11
 #define LIGHTS_PIN 12
+
+#include <Wire.h>
+
 int sensors[SENSOR_COUNT] = {2,4,5,6,7,8,A0,A1,A2,A3};
 int prevs[SENSOR_COUNT] ;
 
@@ -16,6 +19,10 @@ int lightsBtn = 1;
 int dir=0;
 int dirBtn = 1;
 void setup() {
+
+	Wire.begin(0x08);                // join i2c bus with address #8
+	Wire.onReceive(receiveEvent);
+	Wire.onRequest(requestEvent);
  
   for (int i=0; i<SENSOR_COUNT; i++) {
     pinMode(sensors[i], INPUT_PULLUP);
@@ -58,7 +65,7 @@ void loop() {
   
   }  
 
-  checkLocoControls();
+  //checkLocoControls();
 }
 
 void checkLocoControls() {
@@ -92,4 +99,30 @@ void checkLocoControls() {
 
 int toggle(int val){
   return val==1?0:1;  
+}
+
+void requestEvent() {
+	Serial.print("Request: ");
+	if (whatToSend == 18) {
+
+		Serial.println("Sent data");
+		Wire.write(myPin);
+	}
+	else
+	{
+		byte data[] = { 0,0 };
+		Wire.write(data, 2);
+		Serial.println("Sent empty");
+	}
+
+}
+
+void receiveEvent(int howMany) {
+	Serial.print("Receive: ");
+	Serial.println(howMany);
+	while (0 < Wire.available()) { // loop through all but the last
+		int c = Wire.read(); // receive byte as a character
+		Serial.println(c);         // print the character
+		whatToSend = (byte)c;
+	}
 }

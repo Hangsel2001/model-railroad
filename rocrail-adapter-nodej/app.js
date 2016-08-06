@@ -1,5 +1,6 @@
 ﻿var client = require('./RocrailClient.js');
 var rocnet = require('./rocnet.js');
+var wiremaster = require('./wire-master.js');
 var Serial = require('serialport');
 var port = new Serial('COM4', {
     parser: Serial.parsers.readline('\n')
@@ -22,6 +23,10 @@ rl.on('line', function (input) {
 
 rocnet.on('connected', function () {
     console.log("Rocnet connected");   
+});
+
+wiremaster.on("data", function (data) { 
+    console.log(data);
 });
 
 

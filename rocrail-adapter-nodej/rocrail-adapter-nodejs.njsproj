@@ -42,6 +42,7 @@
       <SubType>Code</SubType>
       <TestFramework>Mocha</TestFramework>
     </Compile>
+    <Compile Include="wire-master.js" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>
