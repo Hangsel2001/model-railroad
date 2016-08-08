@@ -17,14 +17,14 @@ util.inherits(Rocnet, EventEmitter);
 //    server.close();
 //});
 
-//server.on('message', function (msg, rinfo) {
-//    var outMsg = "";
-//    for (var i = 0; i < msg.length; i++) {
-//        outMsg += msg[i].toString(16) + " ";
-//    }
-//    console.log('server got: ' + outMsg + " from " + rinfo.address + ":" + rinfo.port);
+server.on('message', function (msg, rinfo) {
+    var outMsg = "";
+    for (var i = 0; i < msg.length; i++) {
+        outMsg += msg[i].toString(16) + " ";
+    }
+    console.log('server got: ' + outMsg + " from " + rinfo.address + ":" + rinfo.port);
     
-//});
+});
 
 //server.on('listening', function () {
 //    var address = server.address();
@@ -59,7 +59,7 @@ Rocnet.prototype.deactivateSensor = function (id) {
 }
 
 Rocnet.prototype.send = function (content) {
-    server.send(Buffer.from(content), 0, 12, 4321, "224.0.0.1", function (err) {
+    server.send(Buffer.from(content), 0, content.length, 4321, "224.0.0.1", function (err) {
         console.log(err);
     })
 };

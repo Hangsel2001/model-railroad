@@ -27,10 +27,7 @@ void setup() {
     pinMode(sensors[i], INPUT_PULLUP);
   }
     for (int i=0; i<BTN_COUNT; i++) {
-		pinMode(btns[i], INPUT);
-		digitalWrite(btns[i], HIGH);
 		pinMode(btns[i], INPUT_PULLUP);
-	
   }
   pinMode(LIGHTS_PIN, INPUT_PULLUP);
   pinMode(DIR_PIN, INPUT_PULLUP);
@@ -104,6 +101,7 @@ int toggle(int val){
 }
 
 void requestEvent() {
+	Serial.println("Request!");
 	uint8_t output[2] = { 0,0 };
 	uint8_t currentByte = 0;
 	for (int i = 0; i < SENSOR_COUNT; i++) {
