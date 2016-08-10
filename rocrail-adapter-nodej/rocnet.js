@@ -17,14 +17,7 @@ util.inherits(Rocnet, EventEmitter);
 //    server.close();
 //});
 
-server.on('message', function (msg, rinfo) {
-    var outMsg = "";
-    for (var i = 0; i < msg.length; i++) {
-        outMsg += msg[i].toString(16) + " ";
-    }
-    console.log('server got: ' + outMsg + " from " + rinfo.address + ":" + rinfo.port);
-    
-});
+
 
 //server.on('listening', function () {
 //    var address = server.address();
@@ -40,6 +33,18 @@ Rocnet.prototype.connect = function () {
     });
     
     console.log("Bound");
+    server.on('message', function (msg, rinfo) {
+        try {
+            var message = packagerFactory.depackage(msg);
+            console.log(message);
+            if (message.Action.Group === packagerFactory.Groups.Host && message.Action.Code === packagerFactory.Codes.Host.PingReq) {
+                self.emit("ping");
+            }
+        } catch (e) { 
+            console.log(e);
+        }
+
+    });
 };
 
 var getSensorPackage = function (options) {
@@ -56,6 +61,17 @@ Rocnet.prototype.activateSensor = function (id) {
 }
 Rocnet.prototype.deactivateSensor = function (id) {
     this.send(getSensorPackage({ State : 0, Port: id }) )   ;
+}
+
+Rocnet.prototype.ping = function() {
+    var pack = packager.Package(
+        {
+            Type: packagerFactory.Types.Event,
+            Group: 0,
+            Code: packagerFactory.Codes.Host.PingRep,
+            Data: []
+        });
+    this.send(pack)
 }
 
 Rocnet.prototype.send = function (content) {

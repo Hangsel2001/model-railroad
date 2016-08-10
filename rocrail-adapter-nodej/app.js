@@ -23,13 +23,7 @@ var destinationMap = { "1": "OE", "2": "IE", "3": "Center", "4": "NW", "5": "SW"
 
 rl.on('line', function (input) {
     if (input === "p") { 
-        var pack = packager.Package(
-            {
-                Group: 0,
-                Code: 2,
-                Data: [0]
-            });
-        rocnet.send(pack)
+      
     } else if (input === "s") { 
         var pack = packager.Package(
             {
@@ -60,6 +54,10 @@ if (wiremaster !== undefined) {
         console.log(data);
     });
 }
+
+rocnet.on('ping', function () { 
+    rocnet.ping();
+});
 
 
 client.on("connected", function () {

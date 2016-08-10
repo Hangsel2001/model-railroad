@@ -37,6 +37,26 @@ describe('packge tests', function () {
         });
         assert.deepEqual(actual, [0, 0, 0, 0, 3, 8, 1, 4, 0, 0, 1, 1, 255]);
     })
+    it('decodes array', function () {
+        var obj = packager.depackage([0, 0, 0, 0, 3, 8, 1, 4, 0, 0, 1, 1, 255]);
+        assert.deepEqual(obj.Data, [0, 0, 1, 1]);
+        assert.equal(obj.Sender, 3);
+    });
+    it('marks event', function () {
+        var obj = packager.depackage([0, 0, 0, 0, 3, 0, 35, 0]);
+        assert.equal(obj.Action.Type, 1);
+        assert.equal(obj.Action.Code, 3);
+    })
+    it('formats as event', function () { 
+        var pack = packager.Packager({ addrHigh: 0, addrLow: 3 });
+        var actual = pack.Package({
+            Type: packager.Types.Event,
+            Group: packager.Groups.Host,
+            Code: packager.Codes.Host.PingRep,
+            Data: []
+        });
+        assert.deepEqual(actual, [0, 0, 0, 0, 3, 0, 35, 0]); 
+    })
 
  
 })
