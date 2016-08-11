@@ -57,6 +57,15 @@ describe('packge tests', function () {
         });
         assert.deepEqual(actual, [0, 0, 0, 0, 3, 0, 35, 0]); 
     })
+    it('data missing equals empty data', function () { 
+        var pack = packager.Packager({ addrHigh: 0, addrLow: 3 });
+        var actual = pack.Package({
+            Type: packager.Types.Event,
+            Group: packager.Groups.Host,
+            Code: packager.Codes.Host.PingRep
+        });
+        assert.deepEqual(actual, [0, 0, 0, 0, 3, 0, 35, 0]); 
+    });
 
  
 })

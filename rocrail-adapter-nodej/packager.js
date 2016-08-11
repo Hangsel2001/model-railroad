@@ -1,9 +1,10 @@
 ﻿
 
-module.exports.Groups = { "Host": 0, "Sensor": 8 };
+module.exports.Groups = { "Host": 0, "Stationary": 3, "Sensor": 8 };
 module.exports.Codes = {
     Host: { "PingReq": 2 , "PingRep": 3},
-    Sensor : { "Report": 1 }
+    Sensor : { "Report": 1 },
+    Stationary: {"Show" : 11 }
 };
 module.exports.Types = { "Request": 0, "Event": 1, "Response": 2 };
 
@@ -20,6 +21,7 @@ var checkSum = function (data) {
 function Packager(options) {
 
     var pack = function (opt) {
+        opt.Data = opt.Data || []
         var type = opt.Type || 0;
         var array = [0, 0, 0];
         array.push(options.addrHigh || 0, options.addrLow || 0, opt.Group, 
