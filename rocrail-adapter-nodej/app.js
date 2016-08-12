@@ -36,7 +36,7 @@ stdin.on('line', function (input) {
 
 if (config.UseI2C === true) {
    
-    wiremaster.on("data", function (data) {
+    wiremaster.on("change", function (data) {
         console.log(data);
     });
 }
