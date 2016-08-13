@@ -1,11 +1,11 @@
-﻿var client = require('./RocrailClient.js');
+﻿var client = require('./rocrailclient.js');
 var rocnet = require('./rocnet.js');
 
 var Serial = require('serialport');
 var config = require('./config.json');
-var port = new Serial(config.COM, {
+var port = config.COM !== undefined ? new Serial(config.COM, {
     parser: Serial.parsers.readline('\n')
-});
+}) : undefined;
 var wiremaster = config.UseI2C ? require('./wire-master.js') : undefined;
 var dgram = require('dgram');
 var server = dgram.createSocket({ type: 'udp4', reuseAddr : true });
@@ -26,10 +26,10 @@ rl.on('line', function (input) {
 rocnet.on('connected', function () {
     console.log("Rocnet connected");   
 });
-
+var prev = [0,0];
 if (wiremaster !== undefined) {
-    wiremaster.on("data", function (data) {
-        console.log(data);
+    wiremaster.on("change", function (data) {
+        console.log(data);        
     });
 }
 
@@ -45,22 +45,23 @@ client.on("connected", function () {
    
 });
 
-port.on('data', function (data) {
-    var type = data[0];
-    var id = data[1];
-    if (type === "S") {
-        var state = data[2];
-        if (state === "1") {
-            rocnet.activateSensor(id);
+if (port !== undefined) {
+    port.on('data', function (data) {
+        var type = data[0];
+        var id = data[1];
+        if (type === "S") {
+            var state = data[2];
+            if (state === "1") {
+                rocnet.activateSensor(id);
                 
-        } else {
-            rocnet.deactivateSensor(id);
+            } else {
+                rocnet.deactivateSensor(id);
+            }
+        } else if (type === "B") {
+            loco.goTo(destinationMap[data[1]]);
         }
-    } else if (type === "B") {
-        loco.goTo(destinationMap[data[1]]);
-    }
 
-});  
-
+    });
+};
 client.connect();
 rocnet.connect();
