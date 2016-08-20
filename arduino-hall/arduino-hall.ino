@@ -2,7 +2,7 @@
 
 #include <Wire.h>
 
-int sensors[SENSOR_COUNT] = { 2,4,5,6,7,8,A0,A1,A2,A3 };
+int sensors[SENSOR_COUNT] = { 2,3,4,5,6,7,8,9,10,11 };
 int prevs[SENSOR_COUNT] = { 0,0,0,0,0,0,0,0,0,0 };
 
 uint8_t output[2] = { 0,0 };
@@ -26,25 +26,22 @@ void loop() {
 		int value = digitalRead(sensors[i]);
 		if (value != prevs[i]) {
 				prevs[i] = value;
+				Serial.print(i);
+				Serial.print(" ");
+				Serial.println(value);
 			}
-			
-			int sensorOut = i + 1;
-			if (sensorOut == 10) {
-				sensorOut = 0;
-			}
-
-
+	
 		}
 	prepareWireData();
 }
 
 void prepareWireData() {
 	uint8_t bytes[] = { 0,0 };
-	uint8_t currentByte = 0;
+	uint8_t currentByte = 1;
 
-	for (int i = 0; i < SENSOR_COUNT; i++) {
-		if (i == 8) {
-			currentByte++;
+	for (int i = SENSOR_COUNT; i >= 0; i--) {
+		if (i == 7) {
+			currentByte--;
 		}
 		uint8_t prev = prevs[i] == 0 ? 1 : 0;
 		bytes[currentByte] = bytes[currentByte] << 1;
