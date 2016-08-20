@@ -42,6 +42,7 @@
       <SubType>Code</SubType>
       <TestFramework>Mocha</TestFramework>
     </Compile>
+    <Compile Include="utils.js" />
     <Compile Include="wire-master.js" />
     <Content Include="config-example.json" />
     <Content Include="config.json" />

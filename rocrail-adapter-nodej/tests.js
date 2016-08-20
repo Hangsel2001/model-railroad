@@ -1,6 +1,7 @@
 ﻿var assert = require('assert');
 var formatter = require('./commandFormatter.js');
 var packager = require('./packager.js');
+var utils = require('./utils.js');
 
 describe('Header handling', function () {
     var command = '<lc dir="false" addr="3" V_raw="30"/>';
@@ -69,3 +70,19 @@ describe('packge tests', function () {
 
  
 })
+
+describe('utils', function () {
+    it('gets all active', function () {
+        var actual = utils.getBitStates(255);
+        assert.deepEqual(actual, [1, 1, 1, 1, 1, 1, 1, 1]);
+    });
+    it('gets some active', function () {
+        var actual = utils.getBitStates(11); // 0b00001011
+        assert.deepEqual(actual, [1, 1 , 0, 1, 0, 0, 0, 0]);
+    });
+
+    it('gets for 2 bytes', function () {
+        var actual = utils.getBitStates([211, 2])// 0b11010011  0b00000010
+        assert.deepEqual(actual, [1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0]);
+    })
+});

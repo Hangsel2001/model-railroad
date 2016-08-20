@@ -1,5 +1,6 @@
 ﻿var EventEmitter = require('events').EventEmitter;
 var util = require('util');
+var utils = require('./utils.js');
 
 function WireMaster() {
     var pause = 50;
@@ -17,9 +18,9 @@ function WireMaster() {
                 console.log(err);
                 that.emit('error', err);
             } else {
-                that.emit("data", res);
+                that.emit("data", utils.getBitStates(res));
                 if (res[0] != prevRes[0] || res[1] != prevRes[1]) {
-                    that.emit("change", res);
+                    that.emit("change", utils.getBitStates(res));
                     prevRes = res;
                 } 
             }
@@ -31,6 +32,7 @@ function WireMaster() {
 
     setTimeout(reader, pause);
 }
+
 
 util.inherits(WireMaster, EventEmitter);
 
