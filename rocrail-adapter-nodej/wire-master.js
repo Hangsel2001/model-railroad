@@ -1,7 +1,10 @@
 ﻿var EventEmitter = require('events').EventEmitter;
 var util = require('util');
+var utils = require('./utils.js');
+
 
 function WireMaster() {
+    var pause = 50;
     var that = this;
     var i2c = require('i2c');
     this.address = 0x08;
@@ -16,20 +19,24 @@ function WireMaster() {
                 console.log(err);
                 that.emit('error', err);
             } else {
-                that.emit("data", res);
+
+                that.emit("data", utils.getBitStates(res));
                 if (res[0] != prevRes[0] || res[1] != prevRes[1]) {
-                    that.emit("change", res);
+                    that.emit("change", utils.getBitStates(res));
+
                     prevRes = res;
                 } 
             }
         });
         if (that.Cancel !== true) {
-            setTimeout(reader, 50);
+
+            setTimeout(reader, pause);
         };
     };
 
-    setTimeout(reader, 50);
+    setTimeout(reader, pause);
 }
+
 
 util.inherits(WireMaster, EventEmitter);
 

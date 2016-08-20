@@ -1,119 +1,68 @@
 #define SENSOR_COUNT  10
-#define BTN_COUNT 5
-#define VELOCITY_PIN A5
-#define DIR_PIN 11
-#define LIGHTS_PIN 12
 
 #include <Wire.h>
 
-int sensors[SENSOR_COUNT] = {2,4,5,6,7,8,A0,A1,A2,A3};
-int prevs[SENSOR_COUNT] ;
+int sensors[SENSOR_COUNT] = { 2,4,5,6,7,8,A0,A1,A2,A3 };
+int prevs[SENSOR_COUNT] = { 0,0,0,0,0,0,0,0,0,0 };
 
-int btns[BTN_COUNT] = {A4,10,9,3,13};
-int btns_prev[BTN_COUNT];
-int btns_val[BTN_COUNT];
-int vel=0;
-int velPrev=0;
-int lights=0;
-int lightsBtn = 1;
-int dir=0;
-int dirBtn = 1;
+uint8_t output[2] = { 0,0 };
+
+volatile bool shouldClear = false;
+
 void setup() {
 
 	Wire.begin(0x08);                // join i2c bus with address #8
 	Wire.onRequest(requestEvent);
- 
-  for (int i=0; i<SENSOR_COUNT; i++) {
-    pinMode(sensors[i], INPUT_PULLUP);
-  }
-    for (int i=0; i<BTN_COUNT; i++) {
-		pinMode(btns[i], INPUT_PULLUP);
-  }
-  pinMode(LIGHTS_PIN, INPUT_PULLUP);
-  pinMode(DIR_PIN, INPUT_PULLUP);
-  pinMode(VELOCITY_PIN, INPUT);
-  Serial.begin(9600);
+
+	for (int i = 0; i < SENSOR_COUNT; i++) {
+		pinMode(sensors[i], INPUT_PULLUP);
+	}
+
+	Serial.begin(9600);
 }
 
 void loop() {
-  for (int i=0; i<SENSOR_COUNT; i++) {
-    int value = digitalRead(sensors[i]);
-    if (value != prevs[i]) {
-      prevs[i] = value;
-      int sensorOut = i+1;
-      if (sensorOut == 10) {
-        sensorOut=  0;
-        }
-        Serial.print("S");
-  	  Serial.print(sensorOut);
-      int out = value == HIGH ? LOW : HIGH;
-  	  Serial.println(out);
-    }
-  
-  }
-   for (int i=0; i<BTN_COUNT; i++) {
-    int btns_val = digitalRead(btns[i]);
-    if (btns_val != btns_prev[i]) {
-      btns_prev[i] = btns_val;
-      if (btns_val == LOW) {
-        int sensorOut = i+1;
-        Serial.print("B");
-        Serial.println(sensorOut);        
-      }
-    }
-  
-  }  
+	for (int i = 0; i < SENSOR_COUNT; i++) {
+		int value = digitalRead(sensors[i]);
+		if (value != prevs[i]) {
+				prevs[i] = value;
+			}
+			
+			int sensorOut = i + 1;
+			if (sensorOut == 10) {
+				sensorOut = 0;
+			}
 
-  //checkLocoControls();
+
+		}
+	prepareWireData();
 }
 
-void checkLocoControls() {
-  int lightsVal = digitalRead(LIGHTS_PIN); 
-  if (lightsVal != lightsBtn) {
-      lightsBtn = lightsVal;
-      if (lightsVal == LOW) {
-        lights = toggle(lights);
-        Serial.print("L");
-        Serial.println(lights);
-      }
-    } 
-  int dirVal = digitalRead(DIR_PIN); 
-  if (dirVal != dirBtn ) {
-      dirBtn = dirVal;
-      if (dirVal == LOW) {
-        dir = toggle(dir);
-        Serial.print("D");
-        Serial.println(dir);
-      }
-    } 
-  int velVal = map(constrain(analogRead(VELOCITY_PIN), 50, 1000), 50, 1000,100, 0);
-  if (velVal - velPrev > 3 || velVal- velPrev < -3 ) {
-      velPrev = velVal;
-      Serial.print("V");
-      Serial.println(velVal);
-    } 
-
-    
-};
-
-int toggle(int val){
-  return val==1?0:1;  
-}
-
-void requestEvent() {
-	Serial.println("Request!");
-	uint8_t output[2] = { 0,0 };
+void prepareWireData() {
+	uint8_t bytes[] = { 0,0 };
 	uint8_t currentByte = 0;
+
 	for (int i = 0; i < SENSOR_COUNT; i++) {
 		if (i == 8) {
 			currentByte++;
 		}
-		output[currentByte] = output[currentByte] & prevs[i];
-		output[currentByte] = output[currentByte] << 1;
+		uint8_t prev = prevs[i] == 0 ? 1 : 0;
+		bytes[currentByte] = bytes[currentByte] << 1;
+		bytes[currentByte] = bytes[currentByte] | prev;
 	}
-		Wire.write(output, 2);
-		Serial.print(output[0]);
-		Serial.print(" ");
-		Serial.println(output[1]);
+	if (shouldClear) {
+		output[0] = bytes[0];
+		output[1] = bytes[1];
+		shouldClear = false;
+	}
+	else {
+		output[0] = output[0] | bytes[0];
+		output[1] = output[1] | bytes[1];
+	}
+}
+
+void requestEvent() {
+	Wire.write(output, 2);
+	shouldClear = true;
 }
 

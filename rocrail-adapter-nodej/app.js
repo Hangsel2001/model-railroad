@@ -33,13 +33,23 @@ stdin.on('line', function (input) {
     }
 });
 
-
+var sensors = [];
 if (config.UseI2C === true) {
    
-    wiremaster.on("data", function (data) {
-        console.log(data);
+    wiremaster.on("change", function (data) {
+        for (var i = 0; i < data.length; i++) {
+            if (data[i] !== sensors[i]) {
+                if (data[i] === 1) {
+                    rocnet.activateSensor(i);
+                } else { 
+                    rocnet.deactivateSensor(i);
+                }
+            }
+        }
+        sensors = data;
     });
 }
+
 
 rocnet.on('connected', function () {
     console.log("Rocnet connected");
