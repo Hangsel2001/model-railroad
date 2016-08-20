@@ -13,7 +13,13 @@ function WireMaster() {
     EventEmitter.call(this);
     var prevRes = [-1, -1];
 
+    this.wire.on('uncaughtException', function (err) {
+
+        console.log(err);
+    })
+
     var reader = function () {
+
         that.wire.read(2, function (err, res) {
             if (err) {
                 console.log(err);
@@ -28,6 +34,7 @@ function WireMaster() {
                 } 
             }
         });
+
         if (that.Cancel !== true) {
 
             setTimeout(reader, pause);
@@ -35,6 +42,8 @@ function WireMaster() {
     };
 
     setTimeout(reader, pause);
+
+  
 }
 
 

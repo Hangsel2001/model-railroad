@@ -1,4 +1,4 @@
-﻿var client = require('./RocrailClient.js');
+﻿var client = require('./rocrailclient.js');
 var packagerFactory = require('./packager.js');
 var wiremaster = require('./wire-master.js');    
 var rocnet = require('./rocnet.js');
@@ -37,6 +37,7 @@ var sensors = [];
 if (config.UseI2C === true) {
    
     wiremaster.on("change", function (data) {
+        console.log(data);
         for (var i = 0; i < data.length; i++) {
             if (data[i] !== sensors[i]) {
                 if (data[i] === 1) {
