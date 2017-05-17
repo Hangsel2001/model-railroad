@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "rocrail-adapter-nodejs", "rocrail-adapter-nodej\rocrail-adapter-nodejs.njsproj", "{F186F7A9-9A09-422D-9247-DFB659277B7C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "arduino-hall", "arduino-hall\arduino-hall.vcxproj", "{B67F06DC-AF43-4AF9-B708-313BF6C9B269}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "command-node", "command-node\command-node.njsproj", "{B0A4D828-9282-4FC0-A399-1D4F3701758F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,18 @@ Global
 		{B67F06DC-AF43-4AF9-B708-313BF6C9B269}.Release|x64.Build.0 = Release|x64
 		{B67F06DC-AF43-4AF9-B708-313BF6C9B269}.Release|x86.ActiveCfg = Release|Win32
 		{B67F06DC-AF43-4AF9-B708-313BF6C9B269}.Release|x86.Build.0 = Release|Win32
+		{B0A4D828-9282-4FC0-A399-1D4F3701758F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0A4D828-9282-4FC0-A399-1D4F3701758F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0A4D828-9282-4FC0-A399-1D4F3701758F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B0A4D828-9282-4FC0-A399-1D4F3701758F}.Debug|x64.Build.0 = Debug|Any CPU
+		{B0A4D828-9282-4FC0-A399-1D4F3701758F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B0A4D828-9282-4FC0-A399-1D4F3701758F}.Debug|x86.Build.0 = Debug|Any CPU
+		{B0A4D828-9282-4FC0-A399-1D4F3701758F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0A4D828-9282-4FC0-A399-1D4F3701758F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0A4D828-9282-4FC0-A399-1D4F3701758F}.Release|x64.ActiveCfg = Release|Any CPU
+		{B0A4D828-9282-4FC0-A399-1D4F3701758F}.Release|x64.Build.0 = Release|Any CPU
+		{B0A4D828-9282-4FC0-A399-1D4F3701758F}.Release|x86.ActiveCfg = Release|Any CPU
+		{B0A4D828-9282-4FC0-A399-1D4F3701758F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

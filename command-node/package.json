@@ -1,0 +1,24 @@
+{
+  "name": "command-node",
+  "version": "0.0.0",
+  "description": "command-node",
+  "main": "app.js",
+  "author": {
+    "name": "Markus Hängsel"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-jasmine": "^2.4.2",
+    "gulp-plumber": "^1.1.0",
+    "jasmine": "^2.6.0",
+    "jasmine-console-reporter": "^1.2.7",
+    "jasmine-reporters": "^2.2.1",
+    "jasmine-spec-reporter": "^4.0.0"
+  },
+  "dependencies": {
+    "keypress": "^0.2.1",
+    "config": "^1.26.1",
+    "defaults": "^1.0.3",
+    "promise": "^7.1.1"
+  }
+}
