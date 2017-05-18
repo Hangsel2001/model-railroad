@@ -75,10 +75,6 @@ var listenloco02 = new Buffer([
 //}, 1000);
 
 
-var rocrailstart = [
-[0x10,0x00]
-];
-
 class z21 extends EventEmitter {
     constructor() {
         super();

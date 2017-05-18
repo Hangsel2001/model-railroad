@@ -25,9 +25,10 @@ class UserInput extends EventEmitter {
             //    this.emit("right");
             //}
         });
-
-        process.stdin.setRawMode(true);
-        process.stdin.resume();
+        if (typeof process.stdin.setRawMode === "function")  {
+            process.stdin.setRawMode(true);
+            process.stdin.resume();
+        }                
     }
 };
 module.exports = UserInput;
