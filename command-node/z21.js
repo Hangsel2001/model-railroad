@@ -1,7 +1,7 @@
 ﻿'use strict';
 var dgram = require('dgram');
 var EventEmitter = require('events').EventEmitter;
-
+var helper = require('./z21-udp-helper');
 
 var getflags = new Buffer([
 
@@ -99,33 +99,23 @@ class z21 extends EventEmitter {
     }
 
     locoLeft() {
-        this.send(new Buffer([
-            0x0A,
-            0x00,
-            0x40,
-            0x00,
-            0xE4,
-            0x13,
-            0x00,
-            0x03,
-            0b00000000,
-            0xE4 ^ 0x13 ^ 0x00 ^ 0x03 ^ 0b00000000
-        ]));
+        this.send(helper.createPackage({
+            type: "loco_drive",
+            address: 3,
+            speed:30,
+            speedSteps :128,
+            direction: "backwards"
+        }));
     }
 
     locoRight() {
-        this.send(new Buffer([
-            0x0A,
-            0x00,
-            0x40,
-            0x00,
-            0xE4,
-            0x13,
-            0x00,
-            0x03,
-            0b10000000,
-            0xE4 ^ 0x13 ^ 0x00 ^ 0x03 ^ 0b10000000
-        ]));
+        this.send(helper.createPackage({
+            type: "loco_drive",
+            address: 3,
+            speed:30,
+            speedSteps :128,
+            direction: "forward"
+        }));
     }
 
     locoRun() {
