@@ -67,6 +67,9 @@
     POWER ON  <Buffer 07 00 40 00 61 01 60 06 00 a1 00 83 7c>
     POWER OFF <Buffer 07 00 40 00 61 00 61 06 00 a1 00 82 7d>
     */
+    describe("loco", ()=> {
+
+    
     it("parses a loco package", () => {
         const package = Buffer.from([0x0e, 0x00, 0x40, 0x00, 0xef, 0x00, 0x03, 0x04, 0xca, 0x10, 0x00, 0x00, 0x00, 0x78]);
         const actual = helper.parsePackage(package);
@@ -83,7 +86,7 @@
         }
         expect(actual).toEqual(expected);
     });
-    describe("loco drive", () => {
+    describe("drive", () => {
         it("creates a loco drive package forward", () => {
             let input = {
                 type: "loco_drive",
@@ -113,6 +116,32 @@
             let expected = Buffer.from([0x0a, 0x00, 0x40, 0x00, 0xe4, 0x13, 0x00, 0x03, 30, 0xea])
             expect(actualReverse).toEqual(expected);
         })
+    })
+    describe("function", ()=> {
+        it("creates a loco function ON package", ()=> {
+            let input = {
+                type: "loco_function",
+                address: 3,
+                function: "lights",
+                value: "on"
+            }
+                    const actual = helper.createPackage(input);
+        let expected= Buffer.from([0x0a,0x00,0x40,0x00,0xe4,0xf8,0x00,0x03,0b01000000,0x5f]);
+        expect(actual).toEqual(expected);
+    });
+    it("creates a loco function OFF package", ()=> {
+            let input = {
+                type: "loco_function",
+                address: 3,
+                function: "lights",
+                value: "off"
+            }
+                    const actual = helper.createPackage(input);
+        let expected= Buffer.from([0x0a,0x00,0x40,0x00,0xe4,0xf8,0x00,0x03,0b00000000,0x1f]);
+        expect(actual).toEqual(expected);
+        });
+
+    })
     })
 
 });

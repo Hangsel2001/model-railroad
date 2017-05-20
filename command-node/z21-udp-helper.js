@@ -34,11 +34,12 @@
     };
 
     function getXorPackage(input) {
+        let command = input.command.length !== undefined ? input.command : [input.command, 0x00]
         let xor = 0;
         for (let i = 0; i < input.data.length; i++) {
             xor = xor ^ input.data[i];
         }
-        let output = prependCount(Buffer.concat([input.command, input.data, Buffer.from([xor])]));
+        let output = prependCount(Buffer.concat([Buffer.from(command), Buffer.from(input.data), Buffer.from([xor])]));
         return output;
     };
 
@@ -90,6 +91,21 @@
                 input.speed | (input.direction === "forward" ? 0b10000000: 0b0)
                 ])
 
+        } else if(input.type === "loco_function") {
+            let value;
+            if (typeof input.function === "number") {
+                value = input.function;
+            } else {
+                if (input.function = "lights") {
+                    value = 0
+                }
+            }            
+            if (input.value === "on") {
+                value = value | 0b01000000;
+            } 
+
+            intermediate.command = LAN_X;
+            intermediate.data = [0xe4,0xf8,0x00, input.address,value];
         }
         return getXorPackage(intermediate);        
     }
