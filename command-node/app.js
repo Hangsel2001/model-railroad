@@ -2,6 +2,7 @@
 
 const input = new (require("./user-input"))();
 const cs = new (require("./z21"))();
+const sensors = new (require("./sensors"))();
 cs.init();
 
 cs.on("message", (message) => {
@@ -17,11 +18,17 @@ input.on("right", () => {
     console.log("right");
 });
 input.on("up", () => {
-    cs.locoRun();
+    cs.turnoutStraight();
 });
 input.on("down", () => {
-    cs.locoStop();
+    cs.turnoutTurn();
 });
-//input.on("space", () => {
-//    cs.locoToggleDir();
-//});
+
+sensors.on("change",(info)=> {
+    console.log(info);
+    if (info.address === 1) {
+        cs.locoRight();
+    } else if (info.address === 8) {
+        cs.locoLeft();
+    }
+});

@@ -17,9 +17,10 @@
     "jasmine-spec-reporter": "^4.0.0"
   },
   "dependencies": {
-    "keypress": "^0.2.1",
     "config": "^1.26.1",
     "defaults": "^1.0.3",
-    "promise": "^7.1.1"
+    "keypress": "^0.2.1",
+    "promise": "^7.1.1",
+    "serialport": "^4.0.7"
   }
 }

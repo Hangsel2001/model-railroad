@@ -1,5 +1,6 @@
 ﻿    const LAN_X = 0x40;
     const LOCO_INFO = 0xEF;
+    const TURNOUT_INFO = 0x43;
 
     const speedSteps = [{
         bit: "0b1",
@@ -44,10 +45,15 @@
     };
 
     function getType(buffer) {
+        if (buffer[0] !== buffer.length) {
+            return "error";
+        }
         if (buffer[2] === LAN_X && buffer[4] === LOCO_INFO) {
             return "loco";
+        } else if(buffer[2] === LAN_X && buffer[4] === TURNOUT_INFO) {
+            return "turnout";
         } else {
-            return "unkown";
+            return "unknown";
         }
     }
 
@@ -70,11 +76,18 @@
 
     }
 
+    function getTurnoutInfo(buffer, parsed) {
+        parsed.address = buffer[6];
+        parsed.position = buffer[7] === 0b10 ? "straight" : "turn";
+    }
+
     function parsePackage(buffer) {
         let parsed = {};
         parsed.type = getType(buffer);
         if (parsed.type === "loco") {
             getLocoInfo(buffer, parsed);
+        } else if (parsed.type === "turnout") {
+            getTurnoutInfo(buffer,parsed);
         }
         return parsed;
     }
@@ -106,6 +119,13 @@
 
             intermediate.command = LAN_X;
             intermediate.data = [0xe4,0xf8,0x00, input.address,value];
+        } else if(input.type === "turnout") {
+            let value = 0b10101000;
+            if (input.position === "straight") {
+                value = value | 0b1;
+            }
+            intermediate.command = LAN_X;
+            intermediate.data = [0x53,0x00, input.address, value]
         }
         return getXorPackage(intermediate);        
     }

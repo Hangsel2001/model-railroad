@@ -67,81 +67,146 @@
     POWER ON  <Buffer 07 00 40 00 61 01 60 06 00 a1 00 83 7c>
     POWER OFF <Buffer 07 00 40 00 61 00 61 06 00 a1 00 82 7d>
     */
-    describe("loco", ()=> {
+    it ('fails if wrong length', () => {
+                    const package = Buffer.from([
+                0x08,0x00,
+                0x40,0x00,
+                0x43,0x00,0x00,0x02,
+                0x43
+            ]);
+            const actual = helper.parsePackage(package);
+            expect(actual.type).toEqual("error");
+    })    
+    describe("loco", () => {
 
-    
-    it("parses a loco package", () => {
-        const package = Buffer.from([0x0e, 0x00, 0x40, 0x00, 0xef, 0x00, 0x03, 0x04, 0xca, 0x10, 0x00, 0x00, 0x00, 0x78]);
-        const actual = helper.parsePackage(package);
-        const expected = {
-            type: "loco",
-            address: 3,
-            direction: "forward",
-            speed: 74,
-            speedSteps: 128,
-            functions: {
-                "lights": true,
-            }
 
-        }
-        expect(actual).toEqual(expected);
-    });
-    describe("drive", () => {
-        it("creates a loco drive package forward", () => {
-            let input = {
-                type: "loco_drive",
+        it("parses a loco package", () => {
+            const package = Buffer.from([0x0e, 0x00, 0x40, 0x00, 0xef, 0x00, 0x03, 0x04, 0xca, 0x10, 0x00, 0x00, 0x00, 0x78]);
+            const actual = helper.parsePackage(package);
+            const expected = {
+                type: "loco",
                 address: 3,
                 direction: "forward",
                 speed: 74,
-                speedSteps: 128
+                speedSteps: 128,
+                functions: {
+                    "lights": true,
+                }
+
             }
-            const actual = helper.createPackage(input);
-            let expected = Buffer.from([0x0a, 0x00, 0x40, 0x00, 0xe4, 0x13, 0x00, 0x03, 0xca, 0x3e])
             expect(actual).toEqual(expected);
-            input.direction = "backwards";
-            input.speed = 30;
-            const actualReverse = helper.createPackage(input);
-            expected = Buffer.from([0x0a, 0x00, 0x40, 0x00, 0xe4, 0x13, 0x00, 0x03, 30, 0xea])
-            expect(actualReverse).toEqual(expected);
         });
+        describe("drive", () => {
+            it("creates a loco drive package forward", () => {
+                let input = {
+                    type: "loco_drive",
+                    address: 3,
+                    direction: "forward",
+                    speed: 74,
+                    speedSteps: 128
+                }
+                const actual = helper.createPackage(input);
+                let expected = Buffer.from([0x0a, 0x00, 0x40, 0x00, 0xe4, 0x13, 0x00, 0x03, 0xca, 0x3e])
+                expect(actual).toEqual(expected);
+                input.direction = "backwards";
+                input.speed = 30;
+                const actualReverse = helper.createPackage(input);
+                expected = Buffer.from([0x0a, 0x00, 0x40, 0x00, 0xe4, 0x13, 0x00, 0x03, 30, 0xea])
+                expect(actualReverse).toEqual(expected);
+            });
             it("creates a loco drive package backwards", () => {
-            let input = {
-                type: "loco_drive",
-                address: 3,
-                direction: "backwards",
-                speed: 30,
-                speedSteps: 128
-            }
-            const actualReverse = helper.createPackage(input);
-            let expected = Buffer.from([0x0a, 0x00, 0x40, 0x00, 0xe4, 0x13, 0x00, 0x03, 30, 0xea])
-            expect(actualReverse).toEqual(expected);
+                let input = {
+                    type: "loco_drive",
+                    address: 3,
+                    direction: "backwards",
+                    speed: 30,
+                    speedSteps: 128
+                }
+                const actualReverse = helper.createPackage(input);
+                let expected = Buffer.from([0x0a, 0x00, 0x40, 0x00, 0xe4, 0x13, 0x00, 0x03, 30, 0xea])
+                expect(actualReverse).toEqual(expected);
+            })
+        })
+        describe("function", () => {
+            it("creates a loco function ON package", () => {
+                let input = {
+                    type: "loco_function",
+                    address: 3,
+                    function: "lights",
+                    value: "on"
+                }
+                const actual = helper.createPackage(input);
+                let expected = Buffer.from([0x0a, 0x00, 0x40, 0x00, 0xe4, 0xf8, 0x00, 0x03, 0b01000000, 0x5f]);
+                expect(actual).toEqual(expected);
+            });
+            it("creates a loco function OFF package", () => {
+                let input = {
+                    type: "loco_function",
+                    address: 3,
+                    function: "lights",
+                    value: "off"
+                }
+                const actual = helper.createPackage(input);
+                let expected = Buffer.from([0x0a, 0x00, 0x40, 0x00, 0xe4, 0xf8, 0x00, 0x03, 0b00000000, 0x1f]);
+                expect(actual).toEqual(expected);
+            });
+
+        })
+    });
+    /*
+        <Buffer 09 00 40 00 43 00 01 01 43> Höger turn
+        <Buffer 09 00 40 00 43 00 01 02 40> Höger straight
+        <Buffer 09 00 40 00 43 00 00 01 42> Vänster turn
+        <Buffer 09 00 40 00 43 00 00 02 41> Vänster straigt
+    */
+    describe("turnout", ()=> {
+        it("parses the turnout TURN package", ()=>{
+            const package = Buffer.from([
+                0x09,0x00,
+                0x40,0x00,
+                0x43,0x00,0x01,0x01,
+                0x43
+            ]);
+            const actual = helper.parsePackage(package);
+            const expected = {
+                type: "turnout",
+                address: 1,
+                position: "turn",
+            };
+            expect(actual).toEqual(expected);
+        })
+         it("parses the turnout STRAIGHT package", ()=>{
+            const package = Buffer.from([
+                0x09,0x00,
+                0x40,0x00,
+                0x43,0x00,0x00,0x02,
+                0x43
+            ]);
+            const actual = helper.parsePackage(package);
+            const expected = {
+                type: "turnout",
+                address: 0,
+                position: "straight",
+            };
+            expect(actual).toEqual(expected);
+        })
+        //"10101000"
+        it("creates a turnout package",()=> {
+            const input = {
+                type: "turnout",
+                address: 0,
+                position: "straight"
+            };
+            const expected = Buffer.from([
+                0x09,0x00,
+                0x40,0x00,
+                0x53,0x00,0x00,0b10101001,
+                0xfa
+            ]);
+            const actual = helper.createPackage(input);
+            expect(actual).toEqual(expected);
         })
     })
-    describe("function", ()=> {
-        it("creates a loco function ON package", ()=> {
-            let input = {
-                type: "loco_function",
-                address: 3,
-                function: "lights",
-                value: "on"
-            }
-                    const actual = helper.createPackage(input);
-        let expected= Buffer.from([0x0a,0x00,0x40,0x00,0xe4,0xf8,0x00,0x03,0b01000000,0x5f]);
-        expect(actual).toEqual(expected);
-    });
-    it("creates a loco function OFF package", ()=> {
-            let input = {
-                type: "loco_function",
-                address: 3,
-                function: "lights",
-                value: "off"
-            }
-                    const actual = helper.createPackage(input);
-        let expected= Buffer.from([0x0a,0x00,0x40,0x00,0xe4,0xf8,0x00,0x03,0b00000000,0x1f]);
-        expect(actual).toEqual(expected);
-        });
 
-    })
-    })
 
 });

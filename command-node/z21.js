@@ -9,8 +9,7 @@ var getflags = new Buffer([
     0x00,
     0x51,
     0x00
-]
-);
+]);
 
 var setflags = new Buffer([
     0x08,
@@ -78,23 +77,20 @@ var listenloco02 = new Buffer([
 class z21 extends EventEmitter {
     constructor() {
         super();
-        this.server = dgram.createSocket({ type: 'udp4' });
+        this.server = dgram.createSocket({
+            type: 'udp4'
+        });
         this.server.on("message", (message, remote) => {
-            if (message[2] != 0x84) {
-                this.emit("message", message);
-            } else {
-                // emit status
+            let parsed = helper.parsePackage(message);
+            if (parsed.type !== "unknown") {
+                this.emit("message", parsed);
             }
-            
+
         });
         this.server.bind(35542);
-        this.index = 0;
-        //setInterval(() => {
-        //    let buf = new Buffer(rocrailstart.length);
-        //    this.send(new 
-        //})
     }
     send(buf) {
+        console.log(buf);
         this.server.send(buf, 0, buf.length, 21105, "192.168.0.111");
     }
 
@@ -102,8 +98,8 @@ class z21 extends EventEmitter {
         this.send(helper.createPackage({
             type: "loco_drive",
             address: 3,
-            speed:30,
-            speedSteps :128,
+            speed: 50,
+            speedSteps: 128,
             direction: "backwards"
         }));
     }
@@ -112,17 +108,25 @@ class z21 extends EventEmitter {
         this.send(helper.createPackage({
             type: "loco_drive",
             address: 3,
-            speed:30,
-            speedSteps :128,
+            speed: 50,
+            speedSteps: 128,
             direction: "forward"
         }));
     }
 
-    locoRun() {
-
+    turnoutStraight() {
+        this.send(helper.createPackage({
+            type: "turnout",
+            address: 1,
+            position: "straight"
+        }));
     }
-    locoStop() {
-
+    turnoutTurn() {
+        this.send(helper.createPackage({
+            type: "turnout",
+            address: 1,
+            position: "turn"
+        }));
     }
 
     init() {
