@@ -17,6 +17,10 @@ input.on("right", () => {
     cs.locoRight();
     console.log("right");
 });
+
+input.on("space", ()=> {
+    cs.locoStop();
+})
 input.on("up", () => {
     cs.turnoutStraight();
 });
@@ -24,11 +28,21 @@ input.on("down", () => {
     cs.turnoutTurn();
 });
 
-sensors.on("change",(info)=> {
-    console.log(info);
-    if (info.address === 1) {
-        cs.locoRight();
-    } else if (info.address === 8) {
-        cs.locoLeft();
+let power = false;
+input.on("return", ()=>{
+    power = !power;
+    if (power) {
+        cs.powerOff();    
+    } else {
+        cs.powerOn();
     }
-});
+})
+
+// sensors.on("change",(info)=> {
+//     console.log(info);
+//     if (info.address === 1) {
+//         cs.locoRight();
+//     } else if (info.address === 8) {
+//         cs.locoLeft();
+//     }
+// });

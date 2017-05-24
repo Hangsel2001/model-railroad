@@ -22,7 +22,7 @@ var setflags = new Buffer([
     0x01
 ]);
 
-var poweron = new Buffer([
+var powerOn = new Buffer([
     0x07,
     0x00,
     0x40,
@@ -32,7 +32,7 @@ var poweron = new Buffer([
     0xa0
 ]);
 
-var poweroff = new Buffer([
+var powerOff = new Buffer([
     0x07,
     0x00,
     0x40,
@@ -88,13 +88,17 @@ class z21 extends EventEmitter {
 
         });
         this.server.bind(35542);
+        this.currentDir = "forward";
     }
     send(buf) {
         console.log(buf);
         this.server.send(buf, 0, buf.length, 21105, "192.168.0.111");
     }
 
+    
+
     locoLeft() {
+        this.currentDir = "backwards";
         this.send(helper.createPackage({
             type: "loco_drive",
             address: 3,
@@ -105,12 +109,23 @@ class z21 extends EventEmitter {
     }
 
     locoRight() {
+        this.currentDir = "forward";
         this.send(helper.createPackage({
             type: "loco_drive",
             address: 3,
             speed: 50,
             speedSteps: 128,
             direction: "forward"
+        }));
+    }
+
+    locoStop() {
+        this.send(helper.createPackage({
+            type: "loco_drive",
+            address: 3,
+            speed: 0,
+            speedSteps: 128,
+            direction: this.currentDir
         }));
     }
 
@@ -127,6 +142,13 @@ class z21 extends EventEmitter {
             address: 1,
             position: "turn"
         }));
+    }
+
+    powerOff() {
+        this.send(powerOff);
+    }
+    powerOn() {
+        this.send(powerOn);
     }
 
     init() {
