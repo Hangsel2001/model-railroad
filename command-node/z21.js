@@ -90,7 +90,13 @@ class z21 extends EventEmitter {
         this.server.bind(35542);
         this.currentDir = "forward";
     }
-    send(buf) {
+    send(data) {
+        let buf;
+        if (data instanceof Buffer) {
+            buf = data;
+        } else {
+            bug = helper.createPackage(data);
+        }
         console.log(buf);
         this.server.send(buf, 0, buf.length, 21105, "192.168.0.111");
     }
