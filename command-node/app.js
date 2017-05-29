@@ -3,6 +3,8 @@
 const input = new (require("./user-input"))();
 const cs = new (require("./z21"))();
 const sensors = new (require("./sensors"))();
+const loco = new(require("./loco"))(cs, 3);
+const Route = require("./route-handler");
 cs.init();
 
 cs.on("message", (message) => {
@@ -38,11 +40,23 @@ input.on("return", ()=>{
     }
 })
 
-// sensors.on("change",(info)=> {
-//     console.log(info);
-//     if (info.address === 1) {
-//         cs.locoRight();
-//     } else if (info.address === 8) {
-//         cs.locoLeft();
-//     }
-// });
+sensors.on("change",(data)=>{
+    console.log(data);
+})
+
+input.on("r", ()=>{
+        let route = new Route(cs, sensors, loco, {
+            name: "Route 1",
+            passing: [6,0],
+            enter: 1,
+            stop: 3,
+            direction: "backwards",
+            turnouts: [{
+                "1": "straight"
+            }]
+        });
+        route.on("error",()=>{
+            cs.powerOff();
+        })
+        route.go();
+})
