@@ -17,9 +17,11 @@ class loco extends events.EventEmitter {
                 this.emit("message", message);
             }
         })
+        z21.send({type:"get_loco", address : this.address});
 
     }
     setSpeed(val) {
+        this.speed=  val;
        this.z21.send({
                 type: "loco_drive",
                 address: this.address,
@@ -31,6 +33,7 @@ class loco extends events.EventEmitter {
         )
     }
     setDirection(dir) {
+        this.direction = dir;
         this.z21.send({
                 type: "loco_drive",
                 address: this.address,

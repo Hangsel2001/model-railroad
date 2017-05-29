@@ -125,7 +125,10 @@
                 value = value | 0b1;
             }
             intermediate.command = LAN_X;
-            intermediate.data = [0x53,0x00, input.address, value]
+            intermediate.data = [0x53,0x00, input.address, value];
+        } else if(input.type === "get_loco") {
+            intermediate.command = LAN_X;
+            intermediate.data = [0xE3,0xF0,0x00, input.address];
         }
         return getXorPackage(intermediate);        
     }

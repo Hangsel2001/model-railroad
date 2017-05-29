@@ -44,19 +44,51 @@ sensors.on("change",(data)=>{
     console.log(data);
 })
 
-input.on("r", ()=>{
+input.on("1", ()=>{
+        if (route) {
+        route.abort();
+    }
         let route = new Route(cs, sensors, loco, {
             name: "Route 1",
-            passing: [6,0],
-            enter: 1,
-            stop: 3,
+            passing: [6,0,1],
+            enter: 3,
+            stop: 4,
             direction: "backwards",
             turnouts: [{
                 "1": "straight"
             }]
         });
-        route.on("error",()=>{
+        route.on("warning",()=>{
             cs.powerOff();
         })
+        route.on("done",()=>{
+            console.log("Done!");
+        });
+        route.go();
+})
+
+let route;
+
+input.on("2", ()=>{
+    if (route) {
+        route.abort();
+    }
+        route = new Route(cs, sensors, loco, {
+            name: "Route 2",
+            passing: [3,1,0],
+            enter: 6,
+            stop: 8,
+            direction: "forward",
+            turnouts: [{
+                "1": "straight"
+            }]
+        });
+        route.on("warning",()=>{
+            cs.powerOff();
+        })
+        route.on("done",()=>{
+            console.log("Done!");
+            route = null;
+        });
         route.go();
 })

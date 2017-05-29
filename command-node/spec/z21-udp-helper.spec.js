@@ -67,16 +67,16 @@
     POWER ON  <Buffer 07 00 40 00 61 01 60 06 00 a1 00 83 7c>
     POWER OFF <Buffer 07 00 40 00 61 00 61 06 00 a1 00 82 7d>
     */
-    it ('fails if wrong length', () => {
-                    const package = Buffer.from([
-                0x08,0x00,
-                0x40,0x00,
-                0x43,0x00,0x00,0x02,
-                0x43
-            ]);
-            const actual = helper.parsePackage(package);
-            expect(actual.type).toEqual("error");
-    })    
+    it('fails if wrong length', () => {
+        const package = Buffer.from([
+            0x08, 0x00,
+            0x40, 0x00,
+            0x43, 0x00, 0x00, 0x02,
+            0x43
+        ]);
+        const actual = helper.parsePackage(package);
+        expect(actual.type).toEqual("error");
+    })
     describe("loco", () => {
 
 
@@ -126,6 +126,25 @@
                 let expected = Buffer.from([0x0a, 0x00, 0x40, 0x00, 0xe4, 0x13, 0x00, 0x03, 30, 0xea])
                 expect(actualReverse).toEqual(expected);
             })
+            it("creates a query package", () => {
+                let input = {
+                    type: "get_loco",
+                    address: 3
+                };
+                const actual = helper.createPackage(input);
+                let expected = Buffer.from([
+                    0x09,
+                    0x00,
+                    0x40,
+                    0x00,
+                    0xE3,
+                    0xF0,
+                    0x00,
+                    3,
+                    0xE3 ^ 0xf0 ^ 0x00 ^ 3
+                ]);
+                expect(actual).toEqual(expected);
+            })
         })
         describe("function", () => {
             it("creates a loco function ON package", () => {
@@ -159,12 +178,12 @@
         <Buffer 09 00 40 00 43 00 00 01 42> Vänster turn
         <Buffer 09 00 40 00 43 00 00 02 41> Vänster straigt
     */
-    describe("turnout", ()=> {
-        it("parses the turnout TURN package", ()=>{
+    describe("turnout", () => {
+        it("parses the turnout TURN package", () => {
             const package = Buffer.from([
-                0x09,0x00,
-                0x40,0x00,
-                0x43,0x00,0x01,0x01,
+                0x09, 0x00,
+                0x40, 0x00,
+                0x43, 0x00, 0x01, 0x01,
                 0x43
             ]);
             const actual = helper.parsePackage(package);
@@ -175,11 +194,11 @@
             };
             expect(actual).toEqual(expected);
         })
-         it("parses the turnout STRAIGHT package", ()=>{
+        it("parses the turnout STRAIGHT package", () => {
             const package = Buffer.from([
-                0x09,0x00,
-                0x40,0x00,
-                0x43,0x00,0x00,0x02,
+                0x09, 0x00,
+                0x40, 0x00,
+                0x43, 0x00, 0x00, 0x02,
                 0x43
             ]);
             const actual = helper.parsePackage(package);
@@ -191,16 +210,16 @@
             expect(actual).toEqual(expected);
         })
         //"10101000"
-        it("creates a turnout package",()=> {
+        it("creates a turnout package", () => {
             const input = {
                 type: "turnout",
                 address: 0,
                 position: "straight"
             };
             const expected = Buffer.from([
-                0x09,0x00,
-                0x40,0x00,
-                0x53,0x00,0x00,0b10101001,
+                0x09, 0x00,
+                0x40, 0x00,
+                0x53, 0x00, 0x00, 0b10101001,
                 0xfa
             ]);
             const actual = helper.createPackage(input);

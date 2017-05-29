@@ -42,6 +42,14 @@ describe("loco", () => {
 
             expect(emit).not.toHaveBeenCalled();
         })
+        it("queries for values on creation", ()=>{
+            let send = spyOn(z21, "send");
+            loco = new Loco(z21, 3);
+            expect(send).toHaveBeenCalledWith({
+                type: "get_loco",
+                address: 3
+            })
+        })
     })
     describe("getters and setters", () => {
         let send;

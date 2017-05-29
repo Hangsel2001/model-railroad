@@ -4,6 +4,8 @@ const EventEmitter = require('events').EventEmitter;
 class RouteHandler extends EventEmitter {
     constructor(z21, sensors, loco, config) {
         super();
+        this.CRUISE = 60;
+        this.SLOW = 20;
         this.z21 = z21;
         this.sensors = sensors;
         this.loco = loco,
@@ -13,24 +15,35 @@ class RouteHandler extends EventEmitter {
         this.sensorOrder.push(config.enter);
         this.sensorOrder.push(config.stop);
         this.sensorIndex = 0;
-    }
-    go() {
-        this.loco.setDirection(this.config.direction);
-        this.loco.setSpeed(70);
-        this.sensors.on("change", (data) => {
+        this.callBack = (data) => {
             if (data.active) {
                 if (data.address === this.sensorOrder[this.sensorIndex]) {
                     this.sensorIndex ++;
                     if (data.address === this.config.stop) {
                         this.loco.setSpeed(0);
+                        this.emit("done");
+                        this.removeAllListeners();
                     } else if (data.address === this.config.enter) {
-                        this.loco.setSpeed(30);
+                        this.loco.setSpeed(this.SLOW);
                     }
                 } else {
-                    this.emit("error", "Unexpected sensor address " + data.address);
+                    this.emit("warning", "Unexpected sensor address " + data.address);
                 }
             };
-        })
+        }
+    }
+    go() {
+        this.loco.setDirection(this.config.direction);
+        this.loco.setSpeed(this.CRUISE);
+ 
+ 
+         this.sensors.on("change", this.callBack )
+    }
+    abort() {
+        this.loco.setSpeed(0);
+        this.emit("aborted");
+        this.sensors.removeListener("change", this.callBack)
+        this.removeAllListeners();
     }
 }
 

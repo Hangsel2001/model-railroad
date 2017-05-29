@@ -36,7 +36,7 @@ describe("Route handler", () => {
     it("sets starts and stops", () => {
         expect(loco.speed).toBe(0);
         route.go();
-        expect(setSpeed).toHaveBeenCalledWith(70);
+        expect(setSpeed).toHaveBeenCalledWith(route.CRUISE);
     })
     it("emits error when unexpected sensor", () => {
         route.go();
@@ -49,7 +49,7 @@ describe("Route handler", () => {
             active: false
         });
         expect(emit).toHaveBeenCalled();
-        expect(emit.calls.mostRecent().args[0]).toBe("error");
+        expect(emit.calls.mostRecent().args[0]).toBe("warning");
     })
     it("checks for passing sensors", ()=>{
         route.go();
@@ -64,7 +64,14 @@ describe("Route handler", () => {
         route.go();
         toggleSensor(1);
         toggleSensor(2);
-        expect(setSpeed.calls.mostRecent().args[0]).toEqual(30);
+        expect(setSpeed.calls.mostRecent().args[0]).toEqual(route.SLOW);
+    })
+
+    it("stops worrying on abort", ()=> {
+        route.go();
+        route.abort();
+        toggleSensor(9);
+         expect(emit.calls.mostRecent().args[0]).not.toBe("warning");
     })
 
     function toggleSensor(addr) {
