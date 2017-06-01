@@ -9,6 +9,15 @@ describe("loco", () => {
         loco = new Loco(z21, 3);
         emit = spyOn(loco, "emit").and.callThrough();
     });
+    describe("name",()=>{
+    it ("has a name",()=>{
+        expect(new Loco(z21,3,"RC5").name).toBe("RC5");
+    })
+    it ("falls back to address",()=>{
+        expect(loco.name).toBe("3");
+    })
+    })
+
     describe("events", () => {
         it("should emit when cs emits", () => {
 

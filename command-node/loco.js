@@ -2,12 +2,13 @@ let events = require("events");
 let merge = require("merge");
 
 class loco extends events.EventEmitter {
-    constructor(z21, address) {
+    constructor(z21, address, name) {
         super();
         this.speed = null;
         this.direction = null;
         this.z21 = z21;
         this.address = address;
+        this.name = name || address.toString();
         z21.on("message", (message) => {
             if (message.type === "loco" && message.address === this.address) {
                 this.speed = message.speed;
@@ -15,6 +16,7 @@ class loco extends events.EventEmitter {
                 this.functions = merge(this.functions, message.functions);
                 this.speedSteps = message.speedSteps;
                 this.emit("message", message);
+               
             }
         })
         z21.send({type:"get_loco", address : this.address});
