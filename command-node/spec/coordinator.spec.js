@@ -25,6 +25,8 @@ describe("Coordinator", ()=> {
         setSpeed =  spyOn(loco, "setSpeed");
         coordinator.loco = loco;
         coordinator.route = route;
+
+
     });
     it("dispatches a loco", ()=>{
         coordinator.dispatch({
