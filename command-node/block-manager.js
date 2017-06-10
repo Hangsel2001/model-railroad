@@ -50,6 +50,7 @@ class BlockManager extends events.EventEmitter {
                         newStatus = "enter";
                     } else if (current.status === "enter" && current.ccw.in === data.address) {
                         newStatus = "in";
+                        this.releasePrevious(current.loco);
                     } 
                     if (newStatus) {
                         current.status = newStatus
@@ -88,12 +89,37 @@ class BlockManager extends events.EventEmitter {
         })
     }
     reserveBlock(blockId, loco) {
-      this.blocks.find((val, index)=>{
+        
+         this.blocks.find((val, index)=>{
             if (val.name === blockId) {
+                if (val.status) {
+                    throw { error: "Can't reserve", message: val.status };
+                }
                 val.status = "reserved";
                 val.loco = loco;
             }
         })
+      this.blocks.find((val, index)=>{
+              if (val.loco === loco && val.name !== blockId) {
+                val.status = "exiting"     ;
+              }
+          });
+      
+          
+    }
+    releasePrevious(loco) {
+            this.blocks.find((val)=>{
+            if (val.loco === loco) {
+                val.status = undefined;
+                val.loco = undefined;
+            }
+        })
+    }
+    getBlock(id) {
+        return this.blocks.find((val)=> {            
+            return val.name === id;
+        })
+        
     }
 
 }

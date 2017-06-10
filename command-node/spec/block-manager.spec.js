@@ -48,6 +48,27 @@ describe("block manager", () => {
             toggleSensor(1);
             expect(manager.blocks[1].status).toBe("in");
         })
+        it("is released on exit", () => {
+            expect(manager.blocks[0].status).toBe("in");
+            manager.reserveBlock("Middle", loco);
+            toggleSensor(0);
+            expect(manager.blocks[0].status).toBe("exiting");
+            toggleSensor(1);
+            expect(manager.blocks[0].status).toBeUndefined();
+            expect(manager.blocks[0].loco).toBeUndefined();
+        });
+        it("can't reserve reserved or occupied", () => {
+            expect(() => {
+                manager.reserveBlock("OuterRight", loco)
+            }).toThrow();
+            manager.reserveBlock("Middle", loco);
+            expect(() => {
+                manager.reserveBlock("Middle", loco)
+            }).toThrow();
+        })
+        it("gets block by name", ()=>{
+            expect(manager.getBlock("Middle")).toBe(manager.blocks[1]);
+        })
     });
 
     // it("determines block by enter", () => {
