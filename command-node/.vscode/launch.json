@@ -18,6 +18,13 @@
             "address": "localhost",
             "port": 5858,
             "outFiles": []
-        }
+        }   ,     {
+            "type": "node",
+            "request": "launch",
+            "name": "Jasmine Tests",
+            "program": "${workspaceRoot}\\node_modules\\jasmine\\bin\\jasmine.js",
+            "outFiles": []
+        },
+
     ]
 }

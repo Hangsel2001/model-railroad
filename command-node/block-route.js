@@ -38,14 +38,26 @@ class Route extends EventEmitter {
     //     }
     // }
     go() {
-        this.manager.reserveBlock(this.def.startBlock);
-        // this.loco.setDirection(this.config.direction);
-        // this.loco.setSpeed(this.CRUISE);
-        // for(let prop in this.config.turnouts) {
-        //     if (this.config.turnouts.hasOwnProperty(prop)) {
-        //         let current = this.config.turnouts[prop];
-        //         this.z21.send({type: "turnout", address: parseInt(prop), position: current });
-        //     };
+        this.manager.reserveBlock(this.def.end, this.def.loco);
+        let start = this.manager.getBlock(this.def.start);
+        let dir = "backwards";
+        if (this.def.direction === start.locoOrientation) {
+            dir = "forward";
+        }
+        this.def.loco.setDirection(dir);
+        this.def.loco.setSpeed(this.CRUISE);
+        
+        this.manager.on("status", (data) => {
+            if (data.name === this.def.end) {
+                if (data.status === "enter") {
+                    this.def.loco.setSpeed(this.SLOW);
+                } else if (data.status === "in") {
+                    this.def.loco.setSpeed(0);
+                    this.emit("done");
+                }
+            }
+        });
+
         };
  
     //      this.sensors.on("change", this.callBack )
