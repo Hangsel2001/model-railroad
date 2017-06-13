@@ -5,17 +5,56 @@ const cs = new(require("./z21"))();
 const sensors = new(require("./sensors"))();
 const loco = new(require("./loco"))(cs, 3);
 const Route = require("./route");
-const blocks = new(require("./block-manager"))(sensors, [loco], require("./spec/helpers/blocks").getBlocks());
-const BlockRoute = new(require("./block-route"))(blocks, {
-    loco: loco,
-    start: "OuterRight",
-    end: "Middle",
-    turnout: {
-        "0": "straight"
-    },
-    direction: "ccw"
-});
+const blocks = new(require("./block-manager"))(cs, sensors, loco);
 
+const routes = [{
+        name: "Route 1",
+        passing: [6, 0, 1],
+        enter: 3,
+        stop: 4,
+        ignore: [8],
+        direction: "backwards",
+        turnouts: {
+            "0": "straight",
+            "1": "straight"
+        }
+    }, {
+        name: "Route 2",
+        passing: [3, 1, 0],
+        enter: 6,
+        stop: 8,
+        ignore: [4],
+        direction: "forward",
+        turnouts: {
+            "0": "straight",
+            "1": "straight"
+        }
+    }, {
+        name: "Route 3",
+        passing: [6, 0, 1],
+        enter: 5,
+        stop: 2,
+        ignore: [8],
+        direction: "backwards",
+        turnouts: {
+            "0": "turn",
+            "1": "straight"
+        }
+    }, {
+        name: "Route 4",
+        passing: [5, 1, 0],
+        enter: 6,
+        stop: 8,
+        ignore: [2],
+        direction: "forward",
+        turnouts: {
+            "0": "turn",
+            "1": "straight"
+        }
+    }
+
+
+]
 cs.init();
 
 cs.on("message", (message) => {
@@ -71,34 +110,12 @@ function handleRoute(config) {
 }
 
 let route = null;
-let hasSet= false;
-input.on("z", () => {
-    if (!hasSet) {
-        blocks.setLocoPosition(loco, "OuterRight", "cw");
-    }
-    if (blocks.getBlock("OuterRight").loco === loco) {
-        
-        let br = new(require("./block-route"))(blocks, {
-            loco: loco,
-            start: "OuterRight",
-            end: "Middle",
-            turnout: {
-                "0": "straight"
-            },
-            direction: "ccw"
-        });
-        br.on("done", () => {
-            console.log("OtoM Done!")
-        });
-        br.go();
-    } else {
-        console.log("Wrong starting block");
-    }
-})
 
 input.on("1", () => {
     handleRoute(routes[0]);
 })
+
+
 
 input.on("2", () => {
     handleRoute(routes[1]);
@@ -115,10 +132,10 @@ input.on("4", () => {
 let rotatePos = 0;
 
 function rotateRoute() {
-    if (wasAborted) {
-        wasAborted = false;
-        return;
-    }
+if (wasAborted) {
+    wasAborted = false;
+    return;
+}
     if (rotatePos === routes.length) {
         rotatePos = 0;
     }
@@ -139,9 +156,9 @@ input.on("a", () => {
     rotateRoute();
 })
 
-let wasAborted = false;
+let wasAborted  = false;
 
-input.on("escape", () => {
+input.on("escape", ()=>{
     if (route) {
         route.abort();
         route = null;
@@ -149,7 +166,7 @@ input.on("escape", () => {
     }
 })
 
-blocks.on("status", (status) => {
+blocks.on("status" , (status)=>{
     console.log("----------------------------------");
     console.log(status);
     console.log("----------------------------------");

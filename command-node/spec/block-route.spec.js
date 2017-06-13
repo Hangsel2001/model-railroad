@@ -58,9 +58,9 @@ describe("Block route handler", () => {
 
     it("sets direction according to loco orientation", ()=> {
         route.go();
-        expect(setDirection).toHaveBeenCalledWith("forward");
-        blockManager.setLocoPosition(loco, "OuterRight", "cw")
+        expect(setDirection).toHaveBeenCalledWith("forward");        
     });
+    
     it("sets backwards direction according to loco orientation", ()=> {
         blockManager.setLocoPosition(loco, "OuterRight", "cw");
         route.go();
