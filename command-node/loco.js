@@ -9,6 +9,7 @@ class loco extends events.EventEmitter {
         this.z21 = z21;
         this.address = address;
         this.name = name || address.toString();
+        this.orientation = "cw"
         z21.on("message", (message) => {
             if (message.type === "loco" && message.address === this.address) {
                 this.speed = message.speed;

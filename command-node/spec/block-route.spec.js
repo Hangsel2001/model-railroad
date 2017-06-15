@@ -6,49 +6,51 @@ let Loco = require("../loco");
 let events = require("events");
 describe("Block route handler", () => {
     var loco, route, blockManager, sensors, z21, setSpeed, setDirection, routeEmit;
-    beforeEach(()=> {
-                z21 = new Z21();        
+    beforeEach(() => {
+        z21 = new Z21();
         sensors = new events.EventEmitter();
-        
+
         loco = new Loco(z21, 3);
         setSpeed = spyOn(loco, "setSpeed");
         setDirection = spyOn(loco, "setDirection");
-        
-        blockManager = new BlockManager(sensors,[loco],blocks.getBlocks());
+
+        blockManager = new BlockManager(sensors, [loco], blocks.getBlocks());
         blockManager.setLocoPosition(loco, "OuterRight", "ccw");
 
         let def = {
             loco: loco,
             start: "OuterRight",
             end: "Middle",
-            turnout: {"0": "straight"},
+            turnout: {
+                "0": "straight"
+            },
             direction: "ccw"
         }
-        route= new Route(blockManager,def);
+        route = new Route(blockManager, def);
         routeEmit = spyOn(route, "emit");
 
     })
-    it("reserves target route",() => {               
+    it("reserves target route", () => {
         let middle = blockManager.getBlock("Middle");
-        route.go();   
+        route.go();
         expect(middle.status).toBe("reserved");
     })
 
-    it("marks as exiting", ()=> {      
+    it("marks as exiting", () => {
         let or = blockManager.getBlock("OuterRight");
         expect(or.status).toBe("in");
-        route.go();   
+        route.go();
         expect(or.status).toBe("exiting");
     })
 
-    it("receives incoming loco", ()=>{
+    it("receives incoming loco", () => {
         let middle = blockManager.getBlock("Middle");
-        route.go();   
- 
+        route.go();
+
         toggleSensor(0);
         expect(middle.status).toBe("enter");
         expect(loco.setSpeed).toHaveBeenCalledWith(route.SLOW);
- 
+
         toggleSensor(1);
         expect(middle.status).toBe("in");
         expect(loco.setSpeed).toHaveBeenCalledWith(0);
@@ -56,16 +58,55 @@ describe("Block route handler", () => {
         expect(route.emit).toHaveBeenCalledWith("done");
     })
 
-    it("sets direction according to loco orientation", ()=> {
+    it("sets direction according to loco orientation", () => {
         route.go();
-        expect(setDirection).toHaveBeenCalledWith("forward");        
+        expect(setDirection).toHaveBeenCalledWith("forward");
     });
-    
-    it("sets backwards direction according to loco orientation", ()=> {
+
+    it("sets backwards direction according to loco orientation", () => {
         blockManager.setLocoPosition(loco, "OuterRight", "cw");
         route.go();
         expect(setDirection).toHaveBeenCalledWith("backwards");
     });
+
+    it("handles multiblock route", () => {
+        let def = {
+            loco: loco,
+            sections: [{
+
+                start: "OuterRight",
+                end: "Middle",
+                turnout: {
+                    "0": "straight"
+                },
+                direction: "ccw"
+            }, {
+
+                start: "Middle",
+                end: "OuterLeft",
+                turnout: {
+                    "1": "straight"
+                },
+                direction: "ccw"
+            }]
+        };
+        route = new Route(blockManager, def);
+        let or = blockManager.getBlock("OuterRight");
+        let mid = blockManager.getBlock("Middle");
+        let ol = blockManager.getBlock("OuterLeft");
+        route.go();
+        toggleSensor(0);
+        expect(mid.status).toBe("enter");
+        toggleSensor(1);
+        toggleSensor(3);
+        expect(mid.status).toBe("exiting");
+        expect(ol.status).toBe("enter");
+
+    })
+
+    xit("keeps full speed when passing", ()=> {
+        
+    })
 
     function toggleSensor(addr) {
         sensors.emit("change", {

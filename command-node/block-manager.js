@@ -84,7 +84,7 @@ class BlockManager extends events.EventEmitter {
             if (val.name === blockId) {
                 val.status = "in";
                 val.loco = loco;
-                val.locoOrientation = orientation;
+                loco.orientation = orientation;
             }
         })
     }
@@ -109,7 +109,7 @@ class BlockManager extends events.EventEmitter {
     }
     releasePrevious(loco) {
             this.blocks.find((val)=>{
-            if (val.loco === loco) {
+            if (val.loco === loco && val.status === "exiting") {
                 val.status = undefined;
                 val.loco = undefined;
             }

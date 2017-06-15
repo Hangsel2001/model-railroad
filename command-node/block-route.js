@@ -3,35 +3,47 @@ const EventEmitter = require('events').EventEmitter;
 
 class Route extends EventEmitter {
     constructor(manager, def) {
-        super();        
+        super();
         this.CRUISE = 55;
         this.SLOW = 10;
         this.manager = manager;
-        this.def = def;        
+        this.def = def;
+        this.sections = def.sections || [def];
+        this.sectionIndex = 0;
+        this.currentSection = this.sections[this.sectionIndex];
     };
-   
-    go() {
-        this.manager.reserveBlock(this.def.end, this.def.loco);
-        let start = this.manager.getBlock(this.def.start);
+
+    reserveAndStart() {
+        this.manager.reserveBlock(this.currentSection.end, this.def.loco);
+        let start = this.manager.getBlock(this.currentSection.start);
         let dir = "backwards";
-        if (this.def.direction === start.locoOrientation) {
+        if (this.currentSection.direction === this.def.loco.orientation) {
             dir = "forward";
         }
         this.def.loco.setDirection(dir);
         this.def.loco.setSpeed(this.CRUISE);
+    }
 
+    go() {
+        this.reserveAndStart();
         this.statusCallback = (data) => {
-            if (data.name === this.def.end) {
+            if (data.name === this.currentSection.end) {
                 if (data.status === "enter") {
                     this.def.loco.setSpeed(this.SLOW);
                 } else if (data.status === "in") {
-                    this.def.loco.setSpeed(0);
-                    this.emit("done");
-                    this.dispose();
+                    if (this.sectionIndex < this.sections.length - 1) {
+                        this.sectionIndex++;
+                        this.currentSection = this.sections[this.sectionIndex];
+                        this.reserveAndStart();
+                    } else {
+                        this.def.loco.setSpeed(0);
+                        this.emit("done");
+                        this.dispose();
+                    }
                 }
             }
         }
-        
+
         this.manager.on("status", this.statusCallback);
 
     };
@@ -44,7 +56,7 @@ class Route extends EventEmitter {
     dispose() {
         this.manager.removeListener("change", this.statusCallback);
     }
- 
+
 }
 
 module.exports = Route
