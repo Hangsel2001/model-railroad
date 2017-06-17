@@ -14,7 +14,7 @@ class Route extends EventEmitter {
     };
 
     reserveAndStart() {
-        this.manager.reserveBlock(this.currentSection.end, this.def.loco);
+        this.manager.reserveBlock(this.currentSection.end, this.def.loco, this.currentSection.direction);
         let start = this.manager.getBlock(this.currentSection.start);
         let dir = "backwards";
         if (this.currentSection.direction === this.def.loco.orientation) {
@@ -22,6 +22,11 @@ class Route extends EventEmitter {
         }
         this.def.loco.setDirection(dir);
         this.def.loco.setSpeed(this.CRUISE);
+        for (let prop in this.def.turnout) {
+            let current = this.def.turnout[prop];
+            this.manager.setTurnout(prop, current);
+        }
+        
     }
 
     go() {
@@ -29,7 +34,9 @@ class Route extends EventEmitter {
         this.statusCallback = (data) => {
             if (data.name === this.currentSection.end) {
                 if (data.status === "enter") {
-                    this.def.loco.setSpeed(this.SLOW);
+                    if (this.sectionIndex >= this.sections.length - 1) {
+                        this.def.loco.setSpeed(this.SLOW);
+                    }                    
                 } else if (data.status === "in") {
                     if (this.sectionIndex < this.sections.length - 1) {
                         this.sectionIndex++;

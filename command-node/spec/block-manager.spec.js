@@ -27,12 +27,16 @@ describe("block manager", () => {
                 enter: 3,
                 in: 4
             }
+        }, {
+            name: "t1",
+            type: "turnout",
+            address: 1
         }];
         z21 = new Z21();
         sensors = new events.EventEmitter();
         loco = new Loco(z21, 3);
         loco.setDirection("backwards");
-        manager = new BlockManager(sensors, [loco], blocks);
+        manager = new BlockManager(sensors, [loco], blocks, z21);
         manager.setLocoPosition(loco, "OuterRight", "ccw");
     })
 
@@ -70,6 +74,29 @@ describe("block manager", () => {
             expect(manager.getBlock("Middle")).toBe(manager.blocks[1]);
         })
     });
+
+    describe ("reserved", ()=> {
+        it("emits unexpected on sensor in unexpected block",()=>{
+            var spy = jasmine.createSpy("callback");
+            manager.on("status", spy);
+            toggleSensor(4);
+            expect(spy).toHaveBeenCalledWith({name: "OuterLeft", status: "unexpected"});                                    
+        });
+        it("emits unexpected on wrong sensor in block",()=>{
+            var spy = jasmine.createSpy("callback");
+            manager.on("status", spy);
+            toggleSensor(1);
+            expect(spy).toHaveBeenCalledWith({name: "Middle", status: "unexpected"});                                    
+        });
+    })
+
+    describe("turnouts", ()=> {
+        it ("sets turnouts", ()=>{
+            var send = spyOn(z21, "send");
+            manager.setTurnout("t1", "straight");
+            expect(send).toHaveBeenCalledWith({type:"turnout", address: 1, position: "straight", })
+        })
+    })
 
     // it("determines block by enter", () => {
     //     sensors.emit("change", {

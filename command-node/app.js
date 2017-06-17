@@ -5,7 +5,7 @@ const cs = new(require("./z21"))();
 const sensors = new(require("./sensors"))();
 const loco = new(require("./loco"))(cs, 3);
 const Route = require("./route");
-const blocks = new(require("./block-manager"))(sensors, [loco], require("./spec/helpers/blocks").getBlocks());
+const blocks = new(require("./block-manager"))(sensors, [loco], require("./spec/helpers/blocks").getBlocks(), cs);
 const BlockRoute = new(require("./block-route"))(blocks, {
     loco: loco,
     start: "OuterRight",
@@ -83,7 +83,7 @@ input.on("z", () => {
             start: "OuterRight",
             end: "Middle",
             turnout: {
-                "0": "straight"
+                "t1": "straight"
             },
             direction: "ccw"
         });
