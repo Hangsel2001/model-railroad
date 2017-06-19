@@ -28,11 +28,11 @@ describe("Coordinator", ()=> {
 
 
     });
-    it("dispatches a loco", ()=>{
-        coordinator.dispatch({
-            loco: "RC5",
-            route: "OuterToOuter"
-        });
-        expect(setSpeed).toHaveBeenCalledWith(route.CRUISE)
-    })
+    // it("dispatches a loco", ()=>{
+    //     coordinator.dispatch({
+    //         loco: "RC5",
+    //         route: "OuterToOuter"
+    //     });
+    //     expect(setSpeed).toHaveBeenCalledWith(route.CRUISE)
+    // })
 })

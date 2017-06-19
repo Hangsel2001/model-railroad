@@ -92,6 +92,9 @@ class BlockManager extends events.EventEmitter {
         })
 
     }
+    getBlocks() {
+        return this.blocks;
+    }
     setTurnout(id, pos) {
         var to = this.getBlock(id);
         this.z21.send({
