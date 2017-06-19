@@ -70,31 +70,49 @@ describe("block manager", () => {
                 manager.reserveBlock("Middle", loco)
             }).toThrow();
         })
-        it("gets block by name", ()=>{
+        it("gets block by name", () => {
             expect(manager.getBlock("Middle")).toBe(manager.blocks[1]);
         })
+
     });
 
-    describe ("reserved", ()=> {
-        it("emits unexpected on sensor in unexpected block",()=>{
-            var spy = jasmine.createSpy("callback");
+    describe("reserved", () => {
+        let spy;
+        beforeEach(() => {
+            spy = jasmine.createSpy("callback");
             manager.on("status", spy);
+        })
+        it("emits unexpected on sensor in unexpected block", () => {
             toggleSensor(4);
-            expect(spy).toHaveBeenCalledWith({name: "OuterLeft", status: "unexpected"});                                    
+            expect(spy).toHaveBeenCalledWith({
+                name: "OuterLeft",
+                status: "unexpected"
+            });
         });
-        it("emits unexpected on wrong sensor in block",()=>{
-            var spy = jasmine.createSpy("callback");
-            manager.on("status", spy);
+        it("emits unexpected on wrong sensor in block", () => {
             toggleSensor(1);
-            expect(spy).toHaveBeenCalledWith({name: "Middle", status: "unexpected"});                                    
+            expect(spy).toHaveBeenCalledWith({
+                name: "Middle",
+                status: "unexpected"
+            });
+        });
+        it("ignores sensors on exiting", () => {
+            let block = manager.getBlock("OuterRight");
+            block.status = "exiting";
+            toggleSensor(6);
+            expect(spy).not.toHaveBeenCalled();
         });
     })
 
-    describe("turnouts", ()=> {
-        it ("sets turnouts", ()=>{
+    describe("turnouts", () => {
+        it("sets turnouts", () => {
             var send = spyOn(z21, "send");
             manager.setTurnout("t1", "straight");
-            expect(send).toHaveBeenCalledWith({type:"turnout", address: 1, position: "straight", })
+            expect(send).toHaveBeenCalledWith({
+                type: "turnout",
+                address: 1,
+                position: "straight",
+            })
         })
     })
 

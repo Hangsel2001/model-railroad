@@ -27,7 +27,7 @@ class BlockManager extends events.EventEmitter {
                         } else if (current.status === "enter" && sensorIn === data.address) {
                             newStatus = "in";
                             this.releasePrevious(current.loco);
-                        } else if (data.address === sensorIn || data.address === enter) {
+                        } else if ((data.address === sensorIn || data.address === enter) && current.status !== "exiting") {
                             newStatus = "unexpected";
                         }
                         if (newStatus) {
