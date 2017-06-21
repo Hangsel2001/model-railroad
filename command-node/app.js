@@ -45,34 +45,51 @@ input.on("return", () => {
 })
 
 sensors.on("change", (data) => {
+    console.log("Sensor:");
     console.log(data);
 })
 
 let hasSet = false;
+function setPosOrDest(name) {
+    if (!hasSet) {
+        blocks.setLocoPosition(loco, name, "cw");
+        hasSet = true;
+        notify("Current Position is set to " + name);
+    } else {
+        planner.addDestination(name);
+        planner.currentRoute.go();
+        notify("New destination is set to " + name);
+    }
+}
+
 input.on("z", () => {
-    if (!hasSet) {
-        blocks.setLocoPosition(loco, "OuterRight", "cw");
-        hasSet = true;
-    }
-    planner.addDestination("Middle");
-    planner.currentRoute.go();
-})
-input.on("x", () => {
-    if (!hasSet) {
-        blocks.setLocoPosition(loco, "Middle", "cw");
-        hasSet = true;
-    }
-    planner.addDestination("OuterRight");
-    planner.currentRoute.go();
-})
+    setPosOrDest("InnerLeft");
+});
+input.on("a", () => {
+    setPosOrDest("OuterLeft");
+});
+input.on("s", () => {
+    setPosOrDest("Middle");
+});
+input.on("d", () => {
+    setPosOrDest("OuterRight");
+});
+input.on("c", () => {
+    setPosOrDest("InnerRight");
+});
+
 
 
 blocks.on("status", (status) => {
-    console.log("----------------------------------");
-    console.log(status);
-    console.log("----------------------------------");
+    notify(status);
     if (status.status === "unexpected") {
         cs.powerOff();
         power = false;
     }
 })
+
+function notify(message) {
+    console.log("----------------------------------");
+    console.log(message);
+    console.log("----------------------------------");
+}

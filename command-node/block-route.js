@@ -22,8 +22,8 @@ class Route extends EventEmitter {
         }
         this.def.loco.setDirection(dir);
         this.def.loco.setSpeed(this.CRUISE);
-        for (let prop in this.def.turnout) {
-            let current = this.def.turnout[prop];
+        for (let prop in this.currentSection.turnout) {
+            let current = this.currentSection.turnout[prop];
             this.manager.setTurnout(prop, current);
         }
         
@@ -34,7 +34,9 @@ class Route extends EventEmitter {
         this.statusCallback = (data) => {
             if (data.name === this.currentSection.end) {
                 if (data.status === "enter") {
-                    if (this.sectionIndex >= this.sections.length - 1) {
+                    let isLast = this.sectionIndex === this.sections.length - 1;
+
+                    if (isLast || this.currentSection.direction !== this.sections[this.sectionIndex + 1].direction) {
                         this.def.loco.setSpeed(this.SLOW);
                     }                    
                 } else if (data.status === "in") {

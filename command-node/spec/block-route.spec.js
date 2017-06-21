@@ -5,7 +5,7 @@ let blocks = require("./helpers/blocks");
 let Loco = require("../loco");
 let events = require("events");
 describe("Block route handler", () => {
-    var loco, route, blockManager, sensors, z21, setSpeed, setDirection, routeEmit, def, outerDef;
+    var loco, route, blockManager, sensors, z21, setSpeed, setDirection, routeEmit, def, outerDef, reverseDef;
     beforeEach(() => {
         z21 = new Z21();
         sensors = new events.EventEmitter();
@@ -34,7 +34,7 @@ describe("Block route handler", () => {
                 start: "OuterRight",
                 end: "Middle",
                 turnout: {
-                    "0": "straight"
+                    "t1": "straight"
                 },
                 direction: "ccw"
             }, {
@@ -42,9 +42,30 @@ describe("Block route handler", () => {
                 start: "Middle",
                 end: "OuterLeft",
                 turnout: {
-                    "1": "straight"
+                    "t0": "straight"
                 },
                 direction: "ccw"
+            }]
+        };
+
+        reverseDef = {
+            loco: loco,
+            sections: [{
+
+                start: "OuterRight",
+                end: "Middle",
+                turnout: {
+                    "t1": "straight"
+                },
+                direction: "ccw"
+            }, {
+
+                start: "Middle",
+                end: "InnerRight",
+                turnout: {
+                    "t1": "turn"
+                },
+                direction: "cw"
             }]
         };
 
@@ -91,28 +112,6 @@ describe("Block route handler", () => {
         expect(setDirection).toHaveBeenCalledWith("backwards");
     });
 
-    it("handles multiblock route", () => {
-
-        route = new Route(blockManager, outerDef);
-        let or = blockManager.getBlock("OuterRight");
-        let mid = blockManager.getBlock("Middle");
-        let ol = blockManager.getBlock("OuterLeft");
-        route.go();
-        toggleSensor(0);
-        expect(mid.status).toBe("enter");
-        toggleSensor(1);
-        toggleSensor(3);
-        expect(mid.status).toBe("exiting");
-        expect(ol.status).toBe("enter");
-
-    })
-
-    it("keeps full speed when passing", () => {
-        route = new Route(blockManager, outerDef);
-        route.go();
-        toggleSensor(0);
-        expect(setSpeed).not.toHaveBeenCalledWith(route.SLOW);
-    })
 
     it("sets route turnouts", () => {
         var setTurnout = spyOn(blockManager, "setTurnout");
@@ -120,6 +119,65 @@ describe("Block route handler", () => {
         route.go();
         expect(setTurnout).toHaveBeenCalledWith("t1", "straight");
     })
+
+    describe("multiblocks", () => {
+        it("handles multiblock route", () => {
+
+            route = new Route(blockManager, outerDef);
+            let or = blockManager.getBlock("OuterRight");
+            let mid = blockManager.getBlock("Middle");
+            let ol = blockManager.getBlock("OuterLeft");
+            route.go();
+            toggleSensor(0);
+            expect(mid.status).toBe("enter");
+            toggleSensor(1);
+            toggleSensor(3);
+            expect(mid.status).toBe("exiting");
+            expect(ol.status).toBe("enter");
+
+        })
+
+
+        it("keeps full speed when passing", () => {
+            route = new Route(blockManager, outerDef);
+            route.go();
+            toggleSensor(0);
+            expect(setSpeed).not.toHaveBeenCalledWith(route.SLOW);
+        })
+
+        it("slows down when changing direction", () => {
+            route = new Route(blockManager, reverseDef);
+            route.go();
+            toggleSensor(0);
+            expect(setSpeed).toHaveBeenCalledWith(route.SLOW);
+        })
+
+        it("changes the turnout after changed direction", ()=> {
+            let setTurnout = spyOn(blockManager, "setTurnout");
+            route = new Route(blockManager, reverseDef);
+            route.go();
+            expect(setTurnout).toHaveBeenCalledWith("t1", "straight");
+            toggleSensor(0);
+            toggleSensor(1);
+            expect(setTurnout).toHaveBeenCalledWith("t1", "turn");
+        })
+
+        it("handles change of direction", () => {
+            route = new Route(blockManager, reverseDef);
+            route.go();
+            expect(setDirection).toHaveBeenCalledWith("forward");
+            toggleSensor(0);
+            toggleSensor(1);
+            expect(setDirection).toHaveBeenCalledWith("backwards");
+            toggleSensor(1);
+            toggleSensor(0);
+            toggleSensor(7);
+            let dest = blockManager.getBlock("InnerRight");
+            expect(dest.status).toBe("enter");
+        })
+
+    });
+
 
     describe("reverse direction", () => {
         beforeEach(() => {
@@ -136,7 +194,7 @@ describe("Block route handler", () => {
             blockManager.setLocoPosition(loco, "Middle", "cw");
             route.go();
         })
-        it("sends loco other direction", () => {            
+        it("sends loco other direction", () => {
             expect(setDirection).toHaveBeenCalledWith("forward");
         })
         it("reverses sensor points", () => {
@@ -144,7 +202,7 @@ describe("Block route handler", () => {
             let right = blockManager.getBlock("OuterRight");
             let middle = blockManager.getBlock("Middle");
             expect(right.status).toBe("enter");
-            expect(middle.status).toBe("exiting");            
+            expect(middle.status).toBe("exiting");
         })
     })
 

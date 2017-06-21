@@ -97,7 +97,7 @@ class z21 extends EventEmitter {
         } else {
             buf = helper.createPackage(data);
         }
-        console.log(buf);
+        // console.log(buf);
         this.server.send(buf, 0, buf.length, 21105, "192.168.0.111");
     }
 

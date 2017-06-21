@@ -50,12 +50,11 @@ describe("travel planner", () => {
             direction: "cw"
         });
     });
-    xit("creates a two-section route",()=> {
+    it("creates a two-section route",()=> {
           blockManager.setLocoPosition(loco, "OuterRight", "cw");
           planner.addDestination("OuterLeft");
           expect(planner.currentRoute.sections.length).toBe(2);
-          expect(planner.currentRoute.section[1]).toEqual({
-            loco: loco,
+          expect(planner.currentRoute.sections[1]).toEqual({
             start: "Middle",
             end: "OuterLeft",
             turnout: {
@@ -63,6 +62,23 @@ describe("travel planner", () => {
             },
             direction: "ccw"
         })
+    })
+    it("can reverse direction in multisection",()=>{
+        blockManager.setLocoPosition(loco, "OuterRight", "cw");
+        planner.addDestination("InnerRight");
+          expect(planner.currentRoute.sections[1]).toEqual({
+            start: "Middle",
+            end: "InnerRight",
+            turnout: {
+                "t1": "turn"
+            },
+            direction: "cw"
+        })
+    })
+
+    it("can handle OuterLeft to InnerLeft", ()=> {
+         blockManager.setLocoPosition(loco, "OuterLeft", "cw");
+         planner.addDestination("InnerLeft");
     })
 
 })

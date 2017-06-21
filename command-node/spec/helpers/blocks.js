@@ -4,12 +4,6 @@
             ccw: {
                 enter: 8,
                 in: 6
-            },
-            connections: {
-                ccw: {
-                    name: "t1",
-                    connector: "straight",
-                }
             }
         }, {
             name: "Middle",
@@ -40,21 +34,11 @@
         }, {
             name: "t0",
             address: 0,
-            type: "turnout",
-            connections: {
-                "straight" : "OuterRight",
-                "turn": "InnerRight",
-                "cw" : "Middle"
-            }
+            type: "turnout"
         },{
             name: "t1",
             address: 1,
-            type: "turnout",
-            connections: {
-                "straight" : "OuterLeft",
-                "turn": "InneLeft",
-                "ccw" : "Middle"
-            }
+            type: "turnout"
         }]
     }
     
