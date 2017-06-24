@@ -18,15 +18,21 @@ class TravelPlanner extends EventEmitter {
         super();
         this.loco = loco;
         this.blockManager = blockManager;
-        this.queue = [];
+        this.destinationQueue = [];
 
         this.blocks = this.blockManager.getBlocks();
         this.routeDefs = routeDefs;
     }
     get currentBlock() {
-        return this.blocks.find((val) => {
+        var current = this.blocks.find((val) => {
             return val.loco === this.loco && val.status === "in";
-        })
+        });
+        if (!current) {
+           current =  this.blocks.find((val) => {
+                return val.loco === this.loco && val.status === "exiting";
+            });
+        }
+        return current;
     }
     getExplicitRoute(dest) {
         return clone(this.routeDefs.find((val) => {
@@ -101,22 +107,46 @@ class TravelPlanner extends EventEmitter {
         }
     }
 
+    nextDestinationActive() {
+        if (this.destinationQueue.length > 0) {
+            let dest = this.destinationQueue.shift();
+            this.nextDestination = this.blockManager.getBlock(dest);
+            let route = this.getExplicitRoute(dest) || this.getReverseRoute(dest) || this.getComposedRoute(this.currentBlock.name, dest);
 
-addDestination(dest) {
-    this.nextDestination = this.blockManager.getBlock(dest);
-    let route = this.getExplicitRoute(dest) || this.getReverseRoute(dest) || this.getComposedRoute(this.currentBlock.name, dest);
+            if (!route) {
+                throw "No matching route";
+            }
+            if (Array.isArray(route)) {
+                route = {
+                    sections: route
+                }
+            }
+            route.loco = this.loco;
+            this.currentRoute = new BlockRoute(this.blockManager, route);
+            this.currentRoute.on("done", () => {
+                this.nextDestinationActive();
+            })
+            this.currentRoute.go();
+            this.emit("destination", this.nextDestination);
+        } else {
+            this.nextDestination = undefined;
+        };
 
-    if (!route) {
-        throw "No matching route";
     }
-    if (Array.isArray(route)) {
-        route = {
-            sections: route
+
+    addDestination(dest) {
+        if (this.destinationQueue.length > 0 && this.destinationQueue[this.destinationQueue.length - 1] === dest) {
+            throw "Already at destination";
         }
+        this.destinationQueue.push(dest);
+        if (!this.nextDestination) {
+            this.nextDestinationActive();
+        };
     }
-    route.loco = this.loco;
-    this.currentRoute = new BlockRoute(this.blockManager, route);
-}
+
+    clearDestinations() {
+        this.destinationQueue = [];
+    }
 }
 
 module.exports = TravelPlanner;

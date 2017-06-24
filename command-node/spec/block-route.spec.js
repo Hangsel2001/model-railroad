@@ -152,7 +152,7 @@ describe("Block route handler", () => {
             expect(setSpeed).toHaveBeenCalledWith(route.SLOW);
         })
 
-        it("changes the turnout after changed direction", ()=> {
+        it("changes the turnout after changed direction", () => {
             let setTurnout = spyOn(blockManager, "setTurnout");
             route = new Route(blockManager, reverseDef);
             route.go();
@@ -174,6 +174,14 @@ describe("Block route handler", () => {
             toggleSensor(7);
             let dest = blockManager.getBlock("InnerRight");
             expect(dest.status).toBe("enter");
+        })
+
+        it("changes turnout for next section on enter", () => {
+            let setTurnout = spyOn(blockManager, "setTurnout");
+            route = new Route(blockManager, outerDef);
+            route.go();       
+            toggleSensor(0);
+            expect(setTurnout).toHaveBeenCalledWith("t0", "straight");
         })
 
     });

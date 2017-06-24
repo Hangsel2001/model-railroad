@@ -13,20 +13,24 @@ class Route extends EventEmitter {
         this.currentSection = this.sections[this.sectionIndex];
     };
 
+    setTurnouts(section) {
+        for (let prop in section.turnout) {
+            let current = section.turnout[prop];
+            this.manager.setTurnout(prop, current);
+        }
+    }
+
     reserveAndStart() {
         this.manager.reserveBlock(this.currentSection.end, this.def.loco, this.currentSection.direction);
-        let start = this.manager.getBlock(this.currentSection.start);
+        // let start = this.manager.getBlock(this.currentSection.start);
         let dir = "backwards";
         if (this.currentSection.direction === this.def.loco.orientation) {
             dir = "forward";
         }
         this.def.loco.setDirection(dir);
         this.def.loco.setSpeed(this.CRUISE);
-        for (let prop in this.currentSection.turnout) {
-            let current = this.currentSection.turnout[prop];
-            this.manager.setTurnout(prop, current);
-        }
-        
+        this.setTurnouts(this.currentSection);
+
     }
 
     go() {
@@ -38,7 +42,10 @@ class Route extends EventEmitter {
 
                     if (isLast || this.currentSection.direction !== this.sections[this.sectionIndex + 1].direction) {
                         this.def.loco.setSpeed(this.SLOW);
-                    }                    
+                    }
+                    if (!isLast) {
+                        this.setTurnouts(this.sections[this.sectionIndex + 1]);
+                    }
                 } else if (data.status === "in") {
                     if (this.sectionIndex < this.sections.length - 1) {
                         this.sectionIndex++;
@@ -63,7 +70,7 @@ class Route extends EventEmitter {
     }
 
     dispose() {
-        this.manager.removeListener("change", this.statusCallback);
+        this.manager.removeListener("status", this.statusCallback);
     }
 
 }

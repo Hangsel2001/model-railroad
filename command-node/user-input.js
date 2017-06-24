@@ -13,8 +13,8 @@ class UserInput extends EventEmitter {
 
         // listen for the "keypress" event 
         process.stdin.on('keypress', (ch, key) => {
-            console.log(ch);
-            console.log('got "keypress"', key);
+            // console.log(ch);
+            // console.log('got "keypress"', key);
             if (key && key.ctrl && key.name == 'c') {
                 process.exit();
             } else {

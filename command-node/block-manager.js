@@ -56,7 +56,7 @@ class BlockManager extends events.EventEmitter {
         })
     }
     reserveBlock(blockId, loco, direction) {
-
+        console.log("** Reserving " + blockId + " **")
         this.blocks.find((val, index) => {
             if (val.name === blockId) {
                 if (val.status) {
