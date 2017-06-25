@@ -34,7 +34,8 @@ describe("travel planner", () => {
             turnout: {
                 "t1": "straight"
             },
-            direction: "ccw"
+            direction: "ccw",
+            slow: true
         });
     });
     it("determins reverse routes if not explicit", () => {
@@ -75,6 +76,11 @@ describe("travel planner", () => {
             direction: "cw"
         })
     })
+    it("sets slow to defined Middle", () => {
+        blockManager.setLocoPosition(loco, "OuterRight", "cw");
+        planner.addDestination("Middle");
+        expect(planner.currentRoute.sections[planner.currentRoute.sections.length -1].slow).toBeTruthy();
+    });
 
     describe("destination queue", () => {
         beforeEach(() => {
@@ -96,14 +102,22 @@ describe("travel planner", () => {
             expect(planner.nextDestination).toBe(blockManager.getBlock("InnerRight"));
         })
 
-        it("cancels upcoming destinations", ()=> {
+        it("cancels upcoming destinations", () => {
             planner.clearDestinations();
             expect(planner.nextDestination.name).toBe("Middle");
             expect(planner.destinationQueue.length).toBe(0);
         })
 
-        it("can't add same destination twice", ()=> {
-            expect(()=> {planner.addDestination("InnerRight")}).toThrow();
+        it("can't add same destination twice", () => {
+                planner = new TravelPlanner(loco, blockManager, inventory.getRouteDefs());
+                    blockManager.setLocoPosition(loco, "OuterRight", "cw");
+            planner.addDestination("Middle");
+            expect(()=> {
+                planner.addDestination("Middle");
+            }).toThrow()
+            // expect(() => {
+            //     planner.addDestination("InnerRight")
+            // }).toThrow();
         })
     })
 
@@ -114,41 +128,41 @@ describe("travel planner", () => {
             planner.addDestination("InnerLeft");
         })
 
-        it ("can handle OuterLeft in special case", ()=> {
+        it("can handle OuterLeft in special case", () => {
             blockManager.setLocoPosition(loco, "InnerLeft", "cw");
-            planner = new TravelPlanner(loco, blockManager, inventory.getRouteDefs());            
+            planner = new TravelPlanner(loco, blockManager, inventory.getRouteDefs());
             planner.addDestination("OuterLeft");
             planner.addDestination("OuterRight");
             planner.addDestination("InnerRight");
             planner.addDestination("OuterLeft");
             planner.addDestination("OuterRight");
             planner.addDestination("InnerLeft");
-            toggleSensor([2,5,1,0,0,1,3,4,4,3,1,0,6,8,8,6,0,1,1,0,7,9,7,0,1,3,4]);            
+            toggleSensor([2, 5, 1, 0, 0, 1, 3, 4, 4, 3, 1, 0, 6, 8, 8, 6, 0, 1, 1, 0, 7, 9, 7, 0, 1, 3, 4]);
         })
+        
     })
 
-  function toggleSensor(addr) {
-      if (addr.length) {
-        for (let a of addr) {
+    function toggleSensor(addr) {
+        if (addr.length) {
+            for (let a of addr) {
+                sensors.emit("change", {
+                    address: a,
+                    active: true
+                });
+                sensors.emit("change", {
+                    address: a,
+                    active: false
+                });
+            }
+        } else {
             sensors.emit("change", {
-            address: a,
-            active: true
-        });
-        sensors.emit("change", {
-            address: a,
-            active: false
-        });
+                address: addr,
+                active: true
+            });
+            sensors.emit("change", {
+                address: addr,
+                active: false
+            });
         }
-      } else {
-        sensors.emit("change", {
-            address: addr,
-            active: true
-        });
-        sensors.emit("change", {
-            address: addr,
-            active: false
-        });
-      }
     }
 })
-

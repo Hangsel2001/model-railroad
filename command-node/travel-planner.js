@@ -28,7 +28,7 @@ class TravelPlanner extends EventEmitter {
             return val.loco === this.loco && val.status === "in";
         });
         if (!current) {
-           current =  this.blocks.find((val) => {
+            current = this.blocks.find((val) => {
                 return val.loco === this.loco && val.status === "exiting";
             });
         }
@@ -121,6 +121,15 @@ class TravelPlanner extends EventEmitter {
                     sections: route
                 }
             }
+
+            if (this.nextDestination.short) {
+                if (route.sections) {
+                    route.sections[route.sections.length - 1].slow = true;
+                } else {
+                    route.slow = true;
+                }
+            }
+
             route.loco = this.loco;
             this.currentRoute = new BlockRoute(this.blockManager, route);
             this.currentRoute.on("done", () => {
@@ -135,7 +144,8 @@ class TravelPlanner extends EventEmitter {
     }
 
     addDestination(dest) {
-        if (this.destinationQueue.length > 0 && this.destinationQueue[this.destinationQueue.length - 1] === dest) {
+        if ((this.destinationQueue.length > 0 && this.destinationQueue[this.destinationQueue.length - 1] === dest) ||
+            this.destinationQueue.length === 0 && this.nextDestination && this.nextDestination.name === dest) {
             throw "Already at destination";
         }
         this.destinationQueue.push(dest);

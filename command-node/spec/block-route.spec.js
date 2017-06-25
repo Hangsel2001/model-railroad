@@ -101,6 +101,15 @@ describe("Block route handler", () => {
         expect(route.emit).toHaveBeenCalledWith("done");
     })
 
+    it("goes slower to short block", () => {
+        def.slow = true;
+        route = new Route(blockManager, def);
+        route.go();
+        expect(loco.setSpeed).toHaveBeenCalledWith(route.STEADY);
+        toggleSensor(0);        
+        expect(loco.setSpeed).toHaveBeenCalledWith(route.MIN);
+    })
+
     it("sets direction according to loco orientation", () => {
         route.go();
         expect(setDirection).toHaveBeenCalledWith("forward");
@@ -179,7 +188,7 @@ describe("Block route handler", () => {
         it("changes turnout for next section on enter", () => {
             let setTurnout = spyOn(blockManager, "setTurnout");
             route = new Route(blockManager, outerDef);
-            route.go();       
+            route.go();
             toggleSensor(0);
             expect(setTurnout).toHaveBeenCalledWith("t0", "straight");
         })

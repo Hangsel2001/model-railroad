@@ -27,11 +27,17 @@ input.on("right", () => {
 input.on("space", () => {
     cs.locoStop();
 })
-input.on("up", () => {
-    cs.turnoutStraight();
+input.on("q", () => {
+    cs.turnoutStraight(0);
 });
-input.on("down", () => {
-    cs.turnoutTurn();
+input.on("w", () => {
+    cs.turnoutTurn(0);
+});
+input.on("e", () => {
+    cs.turnoutStraight(1);
+});
+input.on("r", () => {
+    cs.turnoutTurn(1);
 });
 
 let power = false;

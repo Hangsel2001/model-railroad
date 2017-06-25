@@ -96,6 +96,7 @@ class BlockManager extends events.EventEmitter {
         return this.blocks;
     }
     setTurnout(id, pos) {
+        console.log(id + ": " + pos);
         var to = this.getBlock(id);
         this.z21.send({
             type: "turnout",

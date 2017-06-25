@@ -89,16 +89,27 @@ class z21 extends EventEmitter {
         });
         this.server.bind(35542);
         this.currentDir = "forward";
+        this.queue = [];
+
+        setInterval(()=> {
+            let buf = this.queue.shift();
+            if (buf) {
+                this.server.send(buf, 0, buf.length, 21105, "192.168.0.111");
+            };
+        },5);
     }
+
+
     send(data) {
+        console.log(data);
         let buf;
         if (data instanceof Buffer) {
             buf = data;
         } else {
             buf = helper.createPackage(data);
         }
-        // console.log(buf);
-        this.server.send(buf, 0, buf.length, 21105, "192.168.0.111");
+        console.log(buf);
+       this.queue.push(buf);
     }
 
     
@@ -135,17 +146,17 @@ class z21 extends EventEmitter {
         }));
     }
 
-    turnoutStraight() {
+    turnoutStraight(addr) {
         this.send(helper.createPackage({
             type: "turnout",
-            address: 1,
+            address: addr ,
             position: "straight"
         }));
     }
-    turnoutTurn() {
+    turnoutTurn(addr) {
         this.send(helper.createPackage({
             type: "turnout",
-            address: 1,
+            address: addr ,
             position: "turn"
         }));
     }

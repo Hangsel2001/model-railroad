@@ -10,7 +10,8 @@
             ccw: {
                 enter: 0,
                 in: 1
-            }
+            },
+            short: true
         }, {
             name: "OuterLeft",
             ccw: {

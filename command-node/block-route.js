@@ -4,8 +4,10 @@ const EventEmitter = require('events').EventEmitter;
 class Route extends EventEmitter {
     constructor(manager, def) {
         super();
-        this.CRUISE = 55;
-        this.SLOW = 10;
+        this.CRUISE = 57;
+        this.STEADY = 40;
+        this.SLOW = 15;
+        this.MIN = 10;
         this.manager = manager;
         this.def = def;
         this.sections = def.sections || [def];
@@ -16,7 +18,7 @@ class Route extends EventEmitter {
     setTurnouts(section) {
         for (let prop in section.turnout) {
             let current = section.turnout[prop];
-            this.manager.setTurnout(prop, current);
+            this.manager.setTurnout(prop, current);            
         }
     }
 
@@ -27,9 +29,11 @@ class Route extends EventEmitter {
         if (this.currentSection.direction === this.def.loco.orientation) {
             dir = "forward";
         }
-        this.def.loco.setDirection(dir);
-        this.def.loco.setSpeed(this.CRUISE);
         this.setTurnouts(this.currentSection);
+        this.def.loco.setDirection(dir);
+        let speed = this.currentSection.slow ? this.STEADY : this.CRUISE;
+        this.def.loco.setSpeed(speed);
+
 
     }
 
@@ -41,7 +45,8 @@ class Route extends EventEmitter {
                     let isLast = this.sectionIndex === this.sections.length - 1;
 
                     if (isLast || this.currentSection.direction !== this.sections[this.sectionIndex + 1].direction) {
-                        this.def.loco.setSpeed(this.SLOW);
+                        let speed = this.currentSection.slow? this.MIN : this.SLOW;
+                        this.def.loco.setSpeed(speed);
                     }
                     if (!isLast) {
                         this.setTurnouts(this.sections[this.sectionIndex + 1]);
