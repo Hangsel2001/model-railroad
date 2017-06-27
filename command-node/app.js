@@ -27,18 +27,18 @@ input.on("right", () => {
 input.on("space", () => {
     cs.locoStop();
 })
-input.on("q", () => {
-    cs.turnoutStraight(0);
-});
-input.on("w", () => {
-    cs.turnoutTurn(0);
-});
-input.on("e", () => {
-    cs.turnoutStraight(1);
-});
-input.on("r", () => {
-    cs.turnoutTurn(1);
-});
+// input.on("q", () => {
+//     cs.turnoutStraight(0);
+// });
+// input.on("w", () => {
+//     cs.turnoutTurn(0);
+// });
+// input.on("e", () => {
+//     cs.turnoutStraight(1);
+// });
+// input.on("r", () => {
+//     cs.turnoutTurn(1);
+// });
 
 let power = false;
 input.on("return", () => {
@@ -123,8 +123,9 @@ input.on("d", ()=>{
     setRandom();
 })
 
-input.on("r", ()=>{
-    planner.clearDestinations();
+input.on("escape", ()=>{
+    console.log("Force clear all!!!")
+    planner.clearDestinations(true);
     hasSet=  false;
     cs.locoStop();
     cs.powerOn();

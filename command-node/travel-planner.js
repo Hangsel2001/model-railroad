@@ -154,8 +154,11 @@ class TravelPlanner extends EventEmitter {
         };
     }
 
-    clearDestinations() {
+    clearDestinations(force) {
         this.destinationQueue = [];
+        if (force) {
+            this.nextDestination = undefined;
+        }
     }
 }
 
