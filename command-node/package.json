@@ -19,9 +19,11 @@
   "dependencies": {
     "config": "^1.26.1",
     "defaults": "^1.0.3",
+    "express": "^4.15.3",
     "keypress": "^0.2.1",
     "merge": "^1.2.0",
     "promise": "^7.1.1",
-    "serialport": "^4.0.7"
+    "serialport": "^4.0.7",
+    "socket.io": "^2.0.3"
   }
 }

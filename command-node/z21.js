@@ -90,10 +90,17 @@ class z21 extends EventEmitter {
         this.server.bind(35542);
         this.currentDir = "forward";
         this.queue = [];
+        this.datas = [];
 
         setInterval(()=> {
             let buf = this.queue.shift();
+            let data = this.datas.shift();
+            
             if (buf) {
+                console.log("--------Sending:--------");
+                console.log(data);
+                console.log(buf);
+                console.log("------------------------");
                 this.server.send(buf, 0, buf.length, 21105, "192.168.0.111");
             };
         },10);
@@ -101,14 +108,14 @@ class z21 extends EventEmitter {
 
 
     send(data) {
-        console.log(data);
         let buf;
         if (data instanceof Buffer) {
             buf = data;
+            this.datas.push("--- RAW ---");            
         } else {
             buf = helper.createPackage(data);
+          this.datas.push(data);
         }
-        console.log(buf);
        this.queue.push(buf);
     }
 

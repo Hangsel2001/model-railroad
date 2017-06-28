@@ -1,5 +1,6 @@
 "use strict";
 let events = require("events");
+const util = require('util');
 
 class BlockManager extends events.EventEmitter {
     constructor(sensors, locos, blocks, z21) {
@@ -36,11 +37,26 @@ class BlockManager extends events.EventEmitter {
                                 name: current.name,
                                 status: newStatus
                             })
+                            this.emitInfo(current);
                         }
                     }
                 }
             }
         })
+    }
+    emitInfo(info) {
+         info = Object.assign({}, info);
+        if (info.loco) {
+            let loco = info.loco;
+            info.loco = {
+                name: loco.name,
+                address : loco.address,
+                direction: loco.direction,
+                functions: loco.functions
+            }
+            delete info.loco.z21;
+        }
+        this.emit("info", info);
     }
     setLocoPosition(loco, blockId, orientation) {
         this.blocks.find((val, index) => {
@@ -48,11 +64,13 @@ class BlockManager extends events.EventEmitter {
                 val.status = "in";
                 val.loco = loco;
                 loco.orientation = orientation;
+
             } else if (val.loco === loco) {
                 val.status = undefined;
                 val.loco = undefined;
                 val.orientation = undefined;
             }
+              this.emitInfo(val);
         })
     }
     reserveBlock(blockId, loco, direction) {
@@ -68,11 +86,13 @@ class BlockManager extends events.EventEmitter {
                 val.status = "reserved";
                 val.loco = loco;
                 val.entryDirection = direction || "ccw";
+                         this.emitInfo(val);
             }
         })
         this.blocks.find((val, index) => {
             if (val.loco === loco && val.name !== blockId) {
                 val.status = "exiting";
+                        this.emitInfo(val);
             }
         });
 
@@ -83,6 +103,7 @@ class BlockManager extends events.EventEmitter {
             if (val.loco === loco && val.status === "exiting") {
                 val.status = undefined;
                 val.loco = undefined;
+                this.emitInfo(val);
             }
         })
     }

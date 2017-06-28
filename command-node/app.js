@@ -9,6 +9,20 @@ const blocks = new(require("./block-manager"))(sensors, [loco], require("./spec/
 const inventory = require("./inventory");
 const planner = new(require("./travel-planner"))(loco, blocks, inventory.getRouteDefs());
 
+var express = require('express')
+
+var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io').listen(server);
+app.use(express.static('app'))
+
+app.get(8080, function () {
+    console.log('Example app listening');
+})
+
+server.listen(8080, () => {
+    console.log('listening to 8080');
+});
 cs.init();
 
 cs.on("message", (message) => {
@@ -131,9 +145,17 @@ input.on("escape", ()=>{
     cs.powerOn();
 });
 
+io.on("connection", ()=> {
+    console.log("new connection");
+})
 
+blocks.on("info", (info) => {
+    console.log(info);
+    io.emit("block", info);
+});
 
 blocks.on("status", (status) => {
+ 
     notify(status);
     if (status.status === "unexpected") {
         cs.powerOff();
