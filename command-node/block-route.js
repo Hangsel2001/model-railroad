@@ -23,7 +23,12 @@ class Route extends EventEmitter {
     }
 
     reserveAndStart() {
-        this.manager.reserveBlock(this.currentSection.end, this.def.loco, this.currentSection.direction);
+        try {
+            this.manager.reserveBlock(this.currentSection.end, this.def.loco, this.currentSection.direction);
+        } catch (ex) {
+            console.log(ex);
+            this.def.loco.setSpeed(0);
+        }
         // let start = this.manager.getBlock(this.currentSection.start);
         let dir = "backwards";
         if (this.currentSection.direction === this.def.loco.orientation) {

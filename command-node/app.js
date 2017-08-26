@@ -126,11 +126,14 @@ function setRandom() {
     } while (notSet)
 }
 
-planner.on("destination", ()=>{
+planner.on("destination", (data)=>{
     if (!stop) {
         setRandom();
     }
+    io.emit("destination", data );
 })
+planner.on("queue", (queue) => { io.emit("queue", queue)});
+planner.on("route", (route) => { io.emit("route", route)});
 
 input.on("d", ()=>{
     stop = false;
@@ -154,6 +157,10 @@ blocks.on("info", (info) => {
     io.emit("block", info);
 });
 
+loco.on("change", (data)=>{
+    io.emit("loco", data);
+});
+
 blocks.on("status", (status) => {
  
     notify(status);
@@ -168,3 +175,9 @@ function notify(message) {
     console.log(message);
     console.log("----------------------------------");
 }
+
+process.on('uncaughtException', function(err) {
+    console.log('Caught exception: ' + err);
+    cs.powerOff();
+    setTimeout(()=> {process.exit()}, 300);    
+});

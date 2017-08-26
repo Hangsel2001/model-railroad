@@ -31,7 +31,6 @@ void notifyCVResetFactoryDefault()
 const int DccAckPin = 3 ;
 
 
-
 // SJ Lights Pins
 
 const int count = 2;
@@ -40,59 +39,6 @@ uint8_t states[count] = { 0,0 };
 uint8_t requirements[count][2] = { {255,255}, {0, 1} };
 const int ROOT_ADDRESS = 93;
 
-
-// This function is called by the NmraDcc library when a DCC ACK needs to be sent
-// Calling this function should cause an increased 60ma current drain on the power supply for 6ms to ACK a CV Read 
-
-void notifyCVAck(void)
-{
-  Serial.println("notifyCVAck") ;
-  
-  digitalWrite( DccAckPin, HIGH );
-  delay( 6 );  
-  digitalWrite( DccAckPin, LOW );
-}
-
-// Uncomment to print all DCC Packets
-//#define NOTIFY_DCC_MSG
-#ifdef  NOTIFY_DCC_MSG
-void notifyDccMsg( DCC_MSG * Msg)
-{
-  Serial.print("notifyDccMsg: ") ;
-  for(uint8_t i = 0; i < Msg->Size; i++)
-  {
-    Serial.print(Msg->Data[i], HEX);
-    Serial.write(' ');
-  }
-  Serial.println();
-}
-#endif
-
-// This function is called whenever a normal DCC Turnout Packet is received
-//void notifyDccAccState( uint16_t Addr, uint16_t BoardAddr, uint8_t OutputAddr, uint8_t State)
-//{
-//  Serial.print("notifyDccAccState: ") ;
-//  Serial.print(Addr,DEC) ;
-//  Serial.print(',');
-//  Serial.print(BoardAddr,DEC) ;
-//  Serial.print(',');
-//  Serial.print(OutputAddr,DEC) ;
-//  Serial.print(',');
-//  Serial.println(State, HEX) ;
-//}
-
-// This function is called whenever a normal DCC Turnout Packet is received
-//void notifyDccAccTurnoutBoard( uint16_t BoardAddr, uint8_t OutputPair, uint8_t Direction, uint8_t OutputPower )
-//{
-//  Serial.print("notifyDccAccTurnoutBoard: ") ;
-//  Serial.print(BoardAddr,DEC) ;
-//  Serial.print(',');
-//  Serial.print(OutputPair,DEC) ;
-//  Serial.print(',');
-//  Serial.print(Direction,DEC) ;
-//  Serial.print(',');
-//  Serial.println(OutputPower, HEX) ;
-//}
 
 // This function is called whenever a normal DCC Turnout Packet is received
 void notifyDccAccTurnoutOutput( uint16_t Addr, uint8_t Direction, uint8_t OutputPower )

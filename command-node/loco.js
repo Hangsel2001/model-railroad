@@ -17,7 +17,7 @@ class loco extends events.EventEmitter {
                 this.functions = merge(this.functions, message.functions);
                 this.speedSteps = message.speedSteps;
                 this.emit("message", message);
-               
+                this.notify();
             }
         })
         z21.send({type:"get_loco", address : this.address});
@@ -33,7 +33,8 @@ class loco extends events.EventEmitter {
                 speedSteps: this.speedSteps
             }
 
-        )
+        );
+        this.notify();
     }
     setDirection(dir) {
         this.direction = dir;
@@ -43,7 +44,19 @@ class loco extends events.EventEmitter {
                 direction: dir,
                 speed: this.speed,
                 speedSteps: this.speedSteps
-            })
+            });
+            this.notify();
+    }
+    notify() {
+        this.emit("change", {
+            name: this.name,
+            address: this.address,
+            direction: this.direction,
+            orientation: this.orientation,
+            functions: this.functions,
+            speedSteps: this.speedSteps,
+            speed: this.speed
+        } );
     }
 
 }

@@ -110,6 +110,7 @@ class TravelPlanner extends EventEmitter {
     nextDestinationActive() {
         if (this.destinationQueue.length > 0) {
             let dest = this.destinationQueue.shift();
+            this.emit("queue", this.destinationQueue);
             this.nextDestination = this.blockManager.getBlock(dest);
             let route = this.getExplicitRoute(dest) || this.getReverseRoute(dest) || this.getComposedRoute(this.currentBlock.name, dest);
 
@@ -129,11 +130,12 @@ class TravelPlanner extends EventEmitter {
                     route.slow = true;
                 }
             }
+            this.emit("route", route);
 
             route.loco = this.loco;
             this.currentRoute = new BlockRoute(this.blockManager, route);
             this.currentRoute.on("done", () => {
-                this.nextDestinationActive();
+               setImmediate(()=> { this.nextDestinationActive();});
             })
             this.currentRoute.go();
             this.emit("destination", this.nextDestination);
@@ -149,6 +151,7 @@ class TravelPlanner extends EventEmitter {
             throw "Already at destination";
         }
         this.destinationQueue.push(dest);
+        this.emit("queue", this.destinationQueue);
         if (!this.nextDestination) {
             this.nextDestinationActive();
         };
