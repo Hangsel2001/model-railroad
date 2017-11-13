@@ -74,7 +74,7 @@ class BlockManager extends events.EventEmitter {
         })
     }
     reserveBlock(blockId, loco, direction) {
-        console.log("** Reserving " + blockId + " **")
+     //   console.log("** Reserving " + blockId + " **")
         this.blocks.find((val, index) => {
             if (val.name === blockId) {
                 if (val.status) {
@@ -117,7 +117,7 @@ class BlockManager extends events.EventEmitter {
         return this.blocks;
     }
     setTurnout(id, pos) {
-        console.log(id + ": " + pos);
+    //    console.log(id + ": " + pos);
         var to = this.getBlock(id);
         this.z21.send({
             type: "turnout",

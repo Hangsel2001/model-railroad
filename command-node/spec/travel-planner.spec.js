@@ -139,6 +139,15 @@ describe("travel planner", () => {
             planner.addDestination("InnerLeft");
             toggleSensor([2, 5, 1, 0, 0, 1, 3, 4, 4, 3, 1, 0, 6, 8, 8, 6, 0, 1, 1, 0, 7, 9, 7, 0, 1, 3, 4]);
         })
+
+        it("can handle InnerLeft to OuterLeft via Middle", ()=> {
+            blockManager.setLocoPosition(loco, "InnerLeft", "cw");
+            planner = new TravelPlanner(loco, blockManager, inventory.getRouteDefs());
+            planner.addDestination("Middle");
+            toggleSensor([2,5,1]);
+            planner.addDestination("OuterLeft");
+            toggleSensor([0]);
+        })
         
     })
 

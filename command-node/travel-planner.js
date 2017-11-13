@@ -32,7 +32,7 @@ class TravelPlanner extends EventEmitter {
                 return val.loco === this.loco && val.status === "exiting";
             });
         }
-        return current;
+        return current || {};
     }
     getExplicitRoute(dest) {
         return clone(this.routeDefs.find((val) => {

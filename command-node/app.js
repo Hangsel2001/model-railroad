@@ -56,13 +56,9 @@ input.on("space", () => {
 
 let power = false;
 input.on("return", () => {
-    power = !power;
-    if (power) {
-        cs.powerOff();
-    } else {
-        cs.powerOn();
-    }
+    togglePower();
 })
+
 
 sensors.on("change", (data) => {
     console.log("-- Sensor" + data.address + ": " + data.active + " --");
@@ -70,11 +66,19 @@ sensors.on("change", (data) => {
 
 let hasSet = false;
 
+function togglePower() {
+    power = !power;
+    if (power) {
+        cs.powerOff();
+    }
+    else {
+        cs.powerOn();
+    }
+}
+
 function setPosOrDest(name) {
     if (!hasSet) {
-        blocks.setLocoPosition(loco, name, "cw");
-        hasSet = true;
-        notify("Current Position is set to " + name);
+        setInit(name);
     } else {
         try {
             planner.addDestination(name);
@@ -83,6 +87,12 @@ function setPosOrDest(name) {
             console.log(ex);
         }
     }
+}
+
+function setInit(name) {
+    blocks.setLocoPosition(loco, name, "cw");
+    hasSet = true;
+    notify("Current Position is set to " + name);
 }
 
 input.on("z", () => {
@@ -104,6 +114,7 @@ input.on("x", () => {
     planner.clearDestinations();
     stop = true;
 });
+
 
 function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
@@ -141,15 +152,47 @@ input.on("d", ()=>{
 })
 
 input.on("escape", ()=>{
+  clearAll();
+});
+
+function clearAll() {
     console.log("Force clear all!!!")
     planner.clearDestinations(true);
     hasSet=  false;
     cs.locoStop();
     cs.powerOn();
-});
+}
 
-io.on("connection", ()=> {
+io.on("connection", (socket)=> {
     console.log("new connection");
+    
+    socket.on("destination", (data) => {
+        console.log(data);
+        try {
+            planner.addDestination(data)
+        } catch (ex) {
+            console.log(ex);
+        }
+    });
+
+    socket.on("clear", ()=> {
+        clearAll();
+    })
+
+    socket.on("init", (data)=> {
+        setInit(data);
+    })
+
+    
+    socket.on("power",(data)=> {
+        console.log(data);
+        if (data === "on") {
+            power = false;
+        } else if (data === "off" ) {
+                power = true;
+        };
+        togglePower();
+    })
 })
 
 blocks.on("info", (info) => {
