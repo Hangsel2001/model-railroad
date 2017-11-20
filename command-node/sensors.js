@@ -6,11 +6,10 @@ class Sensors extends EventEmitter {
     constructor() {
         super();
         let port = "COM5";
-        this.port = new Serial(port, {
-            parser: Serial.parsers.readline('\n')
-        });
+        this.port = new Serial(port);
+        this.parser = this.port.pipe(new Serial.parsers.Readline('\n'));
 
-        this.port.on('data', (data) => {
+        this.parser.on('data', (data) => {
             var type = data[0];
             var id = data[1];
             if (type === "S") {

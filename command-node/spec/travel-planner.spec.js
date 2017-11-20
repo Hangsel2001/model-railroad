@@ -93,13 +93,16 @@ describe("travel planner", () => {
         })
 
 
-        it("moves to next destination when done", () => {
+        it("moves to next destination when done", (done) => {
             blockManager.setLocoPosition(loco, "Middle", "cw");
             blockManager.emit("status", {
                 name: "Middle",
                 status: "in"
             });
-            expect(planner.nextDestination).toBe(blockManager.getBlock("InnerRight"));
+            planner.on("route", ()=> {
+                expect(planner.nextDestination).toBe(blockManager.getBlock("InnerRight"));
+                done();
+            })            
         })
 
         it("cancels upcoming destinations", () => {
@@ -131,6 +134,9 @@ describe("travel planner", () => {
         it("can handle OuterLeft in special case", () => {
             blockManager.setLocoPosition(loco, "InnerLeft", "cw");
             planner = new TravelPlanner(loco, blockManager, inventory.getRouteDefs());
+            spyOn(planner, "nextAsync").and.callFake(()=> {
+                planner.nextDestinationActive();
+            });
             planner.addDestination("OuterLeft");
             planner.addDestination("OuterRight");
             planner.addDestination("InnerRight");
@@ -173,5 +179,6 @@ describe("travel planner", () => {
                 active: false
             });
         }
+        // jasmine.clock.tick(10);
     }
 })

@@ -29,7 +29,7 @@ class TravelPlanner extends EventEmitter {
         });
         if (!current) {
             current = this.blocks.find((val) => {
-                return val.loco === this.loco && val.status === "exiting";
+                return val.loco === this.loco && (val.status === "exiting");
             });
         }
         return current || {};
@@ -93,7 +93,7 @@ class TravelPlanner extends EventEmitter {
 
         let allRoutes = this.getAllRoutes(start, ignores);
         if (allRoutes.length === 0) {
-            throw "No matching route";
+            return undefined;
         }
 
         ignores.push(start);
@@ -115,7 +115,7 @@ class TravelPlanner extends EventEmitter {
             let route = this.getExplicitRoute(dest) || this.getReverseRoute(dest) || this.getComposedRoute(this.currentBlock.name, dest);
 
             if (!route) {
-                throw "No matching route";
+                throw new Error("No matching route");
             }
             if (Array.isArray(route)) {
                 route = {
@@ -135,14 +135,26 @@ class TravelPlanner extends EventEmitter {
             route.loco = this.loco;
             this.currentRoute = new BlockRoute(this.blockManager, route);
             this.currentRoute.on("done", () => {
-               setImmediate(()=> { this.nextDestinationActive();});
-            })
+                this.nextAsync();
+            });
             this.currentRoute.go();
             this.emit("destination", this.nextDestination);
         } else {
             this.nextDestination = undefined;
+            this.emit("destination", undefined);
         };
 
+    }
+
+    nextAsync() {
+        setImmediate(()=> {
+            try {
+                this.nextDestinationActive();
+            } catch (ex) {
+                this.emit("error", ex);
+            }
+            });
+    
     }
 
     addDestination(dest) {

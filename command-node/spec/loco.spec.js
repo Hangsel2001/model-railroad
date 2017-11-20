@@ -33,7 +33,7 @@ describe("loco", () => {
             };
             z21.emit("message", expected);
 
-            expect(emit.calls.mostRecent().args[1]).toEqual(expected);
+            expect(emit.calls.mostRecent().args[1].address).toEqual(expected.address);
         })
         it("only emits on own address", () => {
 
