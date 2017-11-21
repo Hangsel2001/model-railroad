@@ -18,13 +18,15 @@ class UserInput extends EventEmitter {
             if (key && key.ctrl && key.name == 'c') {
                 process.exit();
             } else {
-                this.emit(key? key.name : ch);
+                
+                const ascii = (ch || " ").charCodeAt();
+                if(ascii>=48 && ascii<=57) {
+                    this.emit("number", ascii-48);
+                } else {
+                    this.emit(key? key.name : ch);
+                }
             }
-            //if (key.name == "left") {
-            //    this.emit("left");
-            //} else if (key.name == "right") {
-            //    this.emit("right");
-            //}
+           
         });
         if (typeof process.stdin.setRawMode === "function")  {
             process.stdin.setRawMode(true);

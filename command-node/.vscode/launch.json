@@ -15,8 +15,9 @@
             "type": "node",
             "request": "attach",
             "name": "Attach to Port",
+            "protocol": "inspector",
             "address": "localhost",
-            "port": 5858,
+            "port": 9229,
             "outFiles": []
         }   ,     {
             "type": "node",

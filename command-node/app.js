@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const input = new(require("./user-input"))();
 const cs = new(require("./z21"))();
@@ -115,6 +115,10 @@ input.on("x", () => {
     stop = true;
 });
 
+input.on("number", (number)=> {
+    sensors.emit("change", {address:number, active:true});
+    sensors.emit("change", {address:number, active:false});
+});
 
 function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);

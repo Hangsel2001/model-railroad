@@ -117,7 +117,7 @@ describe("travel planner", () => {
             planner.addDestination("Middle");
             expect(()=> {
                 planner.addDestination("Middle");
-            }).toThrow()
+            }).toThrow();
             // expect(() => {
             //     planner.addDestination("InnerRight")
             // }).toThrow();
@@ -149,6 +149,9 @@ describe("travel planner", () => {
         it("can handle InnerLeft to OuterLeft via Middle", ()=> {
             blockManager.setLocoPosition(loco, "InnerLeft", "cw");
             planner = new TravelPlanner(loco, blockManager, inventory.getRouteDefs());
+            spyOn(planner, "nextAsync").and.callFake(()=> {
+                planner.nextDestinationActive();
+            });
             planner.addDestination("Middle");
             toggleSensor([2,5,1]);
             planner.addDestination("OuterLeft");
