@@ -25,11 +25,11 @@ class TravelPlanner extends EventEmitter {
     }
     get currentBlock() {
         var current = this.blocks.find((val) => {
-            return val.loco === this.loco && val.status === "in";
+            return (val.loco && val.loco.address === this.loco.address) && val.status === "in";
         });
         if (!current) {
             current = this.blocks.find((val) => {
-                return val.loco === this.loco && (val.status === "exiting");
+                return  (val.loco && val.loco.address === this.loco.address) && (val.status === "exiting");
             });
         }
         return current || {};

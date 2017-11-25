@@ -48,7 +48,10 @@ class loco extends events.EventEmitter {
             this.notify();
     }
     notify() {
-        this.emit("change", {
+        this.emit("change", this.getInfo() );
+    }
+    getInfo() {
+        return  {
             name: this.name,
             address: this.address,
             direction: this.direction,
@@ -56,7 +59,7 @@ class loco extends events.EventEmitter {
             functions: this.functions,
             speedSteps: this.speedSteps,
             speed: this.speed
-        } );
+        };
     }
 
 }

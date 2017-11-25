@@ -145,10 +145,14 @@ planner.on("destination", (data)=>{
     if (!stop) {
         setRandom();
     }
+    const toSend = Object.assign({}, data);
+    data.loco = data.loco ? data.loco.getInfo() : undefined;
     io.emit("destination", data );
 })
-planner.on("queue", (queue) => { io.emit("queue", queue)});
-planner.on("route", (route) => { io.emit("route", route)});
+planner.on("queue", (queue) => { 
+    io.emit("queue", queue)});
+planner.on("route", (route) => { 
+    io.emit("route", route)});
 
 input.on("d", ()=>{
     stop = false;

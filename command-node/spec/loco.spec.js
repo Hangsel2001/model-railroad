@@ -1,3 +1,5 @@
+"use strict";
+
 let Loco = require("../loco");
 let events = require("events");
 let Z21 = require("./helpers/mock-z21");
@@ -9,14 +11,15 @@ describe("loco", () => {
         loco = new Loco(z21, 3);
         emit = spyOn(loco, "emit").and.callThrough();
     });
-    describe("name",()=>{
-    it ("has a name",()=>{
-        expect(new Loco(z21,3,"RC5").name).toBe("RC5");
-    })
-    it ("falls back to address",()=>{
-        expect(loco.name).toBe("3");
-    })
-    })
+    describe("name", () => {
+        it("has a name", () => {
+            expect(new Loco(z21, 3, "RC5").name).toBe("RC5");
+        });
+        it("falls back to address", () => {
+            expect(loco.name).toBe("3");
+        });
+    });
+
 
     describe("events", () => {
         it("should emit when cs emits", () => {
@@ -51,7 +54,7 @@ describe("loco", () => {
 
             expect(emit).not.toHaveBeenCalled();
         })
-        it("queries for values on creation", ()=>{
+        it("queries for values on creation", () => {
             let send = spyOn(z21, "send");
             loco = new Loco(z21, 3);
             expect(send).toHaveBeenCalledWith({
@@ -102,7 +105,7 @@ describe("loco", () => {
             }
             expect(send.calls.mostRecent().args[0]).toEqual(input);
         })
-        it ("should keep speed when settings direction",()=>{
+        it("should keep speed when settings direction", () => {
             loco.setDirection("backwards");
             let input = {
                 type: "loco_drive",
@@ -113,6 +116,21 @@ describe("loco", () => {
             }
             expect(send.calls.mostRecent().args[0]).toEqual(input);
         })
+        it("should get broadcastable copy of loco", () => {
+            const actual = loco.getInfo();
+            expect(actual).toEqual({
+                    name: "3",
+                    address : 3,
+                    direction: "forward",
+                    functions: {lights:true},
+                    orientation: "cw",
+                    speedSteps: 128,
+                    speed: 74
+                
+            });
+        });
+
+
 
     })
 
