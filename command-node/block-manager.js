@@ -90,7 +90,7 @@ class BlockManager extends events.EventEmitter {
             }
         })
         this.blocks.find((val, index) => {
-            if (val.loco === loco && val.name !== blockId) {
+            if ((val.loco || {}).address === loco.address && val.name !== blockId) {
                 val.status = "exiting";
                         this.emitInfo(val);
             }
@@ -100,7 +100,7 @@ class BlockManager extends events.EventEmitter {
     }
     releasePrevious(loco) {
         this.blocks.find((val) => {
-            if (val.loco === loco && val.status === "exiting") {
+            if ((val.loco || {}).address === loco.address && val.status === "exiting") {
                 val.status = undefined;
                 val.loco = undefined;
                 this.emitInfo(val);

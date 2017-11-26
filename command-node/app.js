@@ -68,7 +68,7 @@ let hasSet = false;
 
 function togglePower() {
     power = !power;
-    if (power) {
+    if (!power) {
         cs.powerOff();
     }
     else {
@@ -145,8 +145,10 @@ planner.on("destination", (data)=>{
     if (!stop) {
         setRandom();
     }
-    const toSend = Object.assign({}, data);
-    data.loco = data.loco ? data.loco.getInfo() : undefined;
+    if (data) {
+        const toSend = Object.assign({}, data);
+        data.loco = data.loco ? data.loco.getInfo() : undefined;
+    }
     io.emit("destination", data );
 })
 planner.on("queue", (queue) => { 

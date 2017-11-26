@@ -124,6 +124,30 @@ describe("travel planner", () => {
         })
     })
 
+    describe("end-to-end", ()=> {
+        beforeEach(()=>{
+            spyOn(planner, "nextAsync").and.callFake(()=> {
+                planner.nextDestinationActive();
+            });
+        });
+        it("will remove exiting", () => {
+          blockManager.setLocoPosition(loco, "InnerLeft", "cw");
+          planner.addDestination("Middle");
+          planner.addDestination("OuterLeft");
+          const innerLeft = blockManager.getBlock("InnerLeft");
+          const middle = blockManager.getBlock("Middle");
+          const outer = blockManager.getBlock("OuterLeft");
+          toggleSensor(2);
+          expect(innerLeft.status).toBe("exiting");
+          toggleSensor([5, 1, 0]);
+          expect(innerLeft.status).toBeUndefined();
+          expect(middle.status).toBe("exiting");
+          expect(outer.status).toBe("reserved");
+          toggleSensor([0,1]);
+          expect(middle.status).toBe("exiting");
+        });
+    })
+
 
     describe("bugs", () => {
         it("can handle OuterLeft to InnerLeft", () => {

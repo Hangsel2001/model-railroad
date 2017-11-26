@@ -72,7 +72,17 @@ describe("block manager", () => {
         })
         it("gets block by name", () => {
             expect(manager.getBlock("Middle")).toBe(manager.blocks[1]);
-        })
+        });
+        it("releases previous", () => {
+   
+            manager.reserveBlock("Middle", loco);
+            const or = manager.getBlock("OuterRight");
+            toggleSensor(6);
+            toggleSensor(0);
+            expect(or.status).toBe("exiting");
+            toggleSensor(1);
+            expect(or.status).toBeUndefined();
+        });
 
     });
 
